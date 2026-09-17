@@ -7,7 +7,7 @@
 
 - 📫 How to reach me **dwiputdika@gmail.com**
 
-- ⚡ Fun fact **I love playing Wuthering Waves, and my fav pokemon is zorua.**
+- ⚡ Fun fact **I love playing Wuthering Waves, and my fav pokemon is Zorua.**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
