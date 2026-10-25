@@ -14,7 +14,7 @@
 |---|---|
 | 🔭 **Working on** | Simerah Koja |
 | 🌱 **Learning** | Laravel |
-| 📫 **Contact** | akidpeyud@gmail.com |
+| 📫 **Contact** | dwiputdika@gmail.com |
 | ⚡ **Fun fact** | I love playing Wuthering Waves, and my favorite Pokémon is Zorua |
 
 ---
