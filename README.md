@@ -2,7 +2,7 @@
 <h3 align="center">Computer Science Student</h3>
 
 <p align="center">
-  <a href="mailto:dwiputdika@gmail.com"><img src="https://img.shields.io/badge/Email-dwiputdika%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+  <a href="mailto:akidpeyud@gmail.com"><img src="https://img.shields.io/badge/Email-akidpeyud%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
   <a href="https://instagram.com/dikaading"><img src="https://img.shields.io/badge/Instagram-dikaading-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" /></a>
 </p>
 
@@ -14,7 +14,7 @@
 |---|---|
 | 🔭 **Working on** | Simerah Koja |
 | 🌱 **Learning** | Laravel |
-| 📫 **Contact** | dwiputdika@gmail.com |
+| 📫 **Contact** | akidpeyud@gmail.com |
 | ⚡ **Fun fact** | I love playing Wuthering Waves, and my favorite Pokémon is Zorua |
 
 ---
@@ -36,6 +36,6 @@
 ### 📊 GitHub Stats
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=dwiputdika&show_icons=true&theme=tokyonight&hide_border=true" alt="GitHub Stats" height="160" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=dwiputdika&layout=compact&theme=tokyonight&hide_border=true" alt="Top Languages" height="160" />
+  <img src="https://github-readme-stats.vercel.app/api?username=akidpeyud&show_icons=true&theme=tokyonight&hide_border=true" alt="GitHub Stats" height="160" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=akidpeyud&layout=compact&theme=tokyonight&hide_border=true" alt="Top Languages" height="160" />
 </p>
