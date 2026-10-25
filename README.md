@@ -2,7 +2,7 @@
 <h3 align="center">Computer Science Student</h3>
 
 <p align="center">
-  <a href="mailto:akidpeyud@gmail.com"><img src="https://img.shields.io/badge/Email-akidpeyud%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+  <a href="mailto:akidpeyud@gmail.com"><img src="https://img.shields.io/badge/Email-dwiputdika%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
   <a href="https://instagram.com/dikaading"><img src="https://img.shields.io/badge/Instagram-dikaading-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" /></a>
 </p>
 
