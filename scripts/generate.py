@@ -4,7 +4,7 @@ Generator aset pixel-art untuk profil GitHub: Stellar Explorer (Penjelajah Binta
 Menghasilkan 3 file SVG di folder assets/:
   - banner.svg        : Astronot melayang bebas di tengah kiri dekat bintang suar
   - stats.svg         : Logbook navigasi antariksa & telemetri sistem
-  - contrib-game.svg  : Astronot mengambang bebas di luar angkasa memegang senter dari awal dan menyorot rasi bintang
+  - contrib-game.svg  : Astronot mengambang bebas di luar angkasa, senter terkunci di tangan & terus menyenter ke bintang
 
 Hanya memakai pustaka standar Python.
 """
@@ -78,7 +78,6 @@ def sprite(grid, colors, px):
 
 
 # ───────────────────────── pixel sprites ─────────────────────────
-# Astronot melayang bebas di antariksa sambil memegang senter di tangan
 ASTRONAUT_TORCH_GRID = [
     "...WWWWWW.......",  # 0
     "..WWWWWWWW......",  # 1
@@ -275,7 +274,6 @@ def make_banner(score, coins, quest):
 </defs>
 <style>
   {FONT}
-  /* Animasi melayang di tengah kiri dekat bintang suar */
   .spacewalk-float {{
     animation: flight_relative 7s ease-in-out infinite;
   }}
@@ -472,9 +470,10 @@ def grade_for(total):
 def make_game(days, total, best):
     """
     Stellar Expedition:
-    - Astronot MENGAMBANG bebas di luar angkasa (zero-G floating) di bawah rasi bintang.
-    - Senter dipegang dan menyala menyorot ke atas ke arah bintang SEJAK AWAL animasi (0%).
-    - Bersih tanpa label bulan & hari.
+    - Astronot MENGAMBANG di bawah rasi bintang dan MENYENTER KE ATAS ke arah gugusan bintang.
+    - Senter TERKUNCI PERMANEN di tangan astronot, tidak akan pernah lepas / terpisah.
+    - Di ending exploring, astronot tetap berada di bawah bintang dan terus menyenter ke rasi bintang.
+    - Panel laporan misi muncul rapi di sebelah kiri tanpa menutupi astronot atau senternya.
     """
     W, H = 900, 310
     T = 20  # Durasi siklus animasi dalam detik
@@ -530,41 +529,42 @@ def make_game(days, total, best):
                 f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{SKY3}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.5"/>'
             )
 
-    # Titik tujuan mengambang: tepat di bawah gugusan bintang aktif di kanan
-    target_float_x = gx + 37 * pitch_x - 30
+    # Titik tujuan mengambang: tepat di bawah gugusan bintang aktif di kanan (x ≈ 530)
+    target_float_x = gx + 37 * pitch_x - 75
 
     css = [
-        # Astronot MENGAMBANG di gravitasi nol menyusuri bawah rasi bintang
+        # Astronot mengambang maju, lalu di ending exploring TETAP BERADA di bawah bintang sambil terus menyenter
         f"@keyframes astro_float_beneath {{"
         f"  0%   {{ transform: translate(50px, 0px) rotate(0deg); }}"
-        f"  18%  {{ transform: translate({target_float_x*0.4:.0f}px, -10px) rotate(-4deg); }}"
-        f"  38%  {{ transform: translate({target_float_x:.0f}px, 2px) rotate(2deg); }}"
-        f"  50%  {{ transform: translate({target_float_x+10:.0f}px, -4px) rotate(-2deg); }}"
-        f"  65%  {{ transform: translate({target_float_x:.0f}px, 3px) rotate(1deg); }}"
-        f"  88%  {{ transform: translate(50px, -6px) rotate(-3deg); }}"
+        f"  26%  {{ transform: translate({target_float_x:.0f}px, -6px) rotate(-3deg); }}"
+        f"  32%  {{ transform: translate({target_float_x+10:.0f}px, 2px) rotate(1deg); }}"
+        f"  50%  {{ transform: translate({target_float_x+15:.0f}px, -3px) rotate(-1deg); }}"
+        f"  70%  {{ transform: translate({target_float_x+10:.0f}px, 3px) rotate(1deg); }}"
+        f"  84%  {{ transform: translate({target_float_x:.0f}px, 0px) rotate(0deg); }}"
+        f"  94%  {{ transform: translate(50px, -4px) rotate(-2deg); }}"
         f"  100% {{ transform: translate(50px, 0px) rotate(0deg); }}"
         f"}}",
-        # Senter MENYALA SEJAK AWAL (0%) dan semakin terang saat di gugusan bintang
+        # Senter menyala sejak awal dan terus menyinari rasi bintang tanpa pernah lepas/lepas
         "@keyframes flashlight_active {"
-        "  0%, 35%  { opacity: 0.75; transform: scale(0.92); }"
-        "  38%, 64% { opacity: 1.0; transform: scale(1.15); filter: drop-shadow(0 0 5px #67E8F9); }"
-        "  68%, 100%{ opacity: 0.75; transform: scale(0.92); }"
+        "  0%, 28%  { opacity: 0.8; filter: drop-shadow(0 0 3px #67E8F9); }"
+        "  32%, 84% { opacity: 1.0; filter: drop-shadow(0 0 6px #67E8F9); }"
+        "  88%, 100%{ opacity: 0.8; filter: drop-shadow(0 0 3px #67E8F9); }"
         "}",
-        # Semburan kecil pendorong RCS saat mengambang
         "@keyframes rcs_thrust {"
-        "  0%, 38%  { opacity: 0.85; transform: scale(1.1); }"
-        "  42%, 65% { opacity: 0.2; transform: scale(0.6); }"
-        "  70%, 95% { opacity: 0.85; transform: scale(1.1); }"
+        "  0%, 30%  { opacity: 0.85; transform: scale(1.1); }"
+        "  32%, 84% { opacity: 0.25; transform: scale(0.6); }"
+        "  88%, 98% { opacity: 0.85; transform: scale(1.1); }"
         "  100%     { opacity: 0.4; }"
         "}",
         "@keyframes star_glow {"
         "  0%, 100% { opacity: 0.8; }"
         "  50% { opacity: 1; filter: drop-shadow(0 0 4px #FFD166); }"
         "}",
+        # Layar hasil ekspedisi tampil di kiri tanpa menutupi astronot di kanan
         f"@keyframes hud_report {{"
-        f"  0%, 42% {{ opacity: 0; transform: translateY(12px); }}"
-        f"  46%, 94% {{ opacity: 1; transform: translateY(0px); }}"
-        f"  98%, 100% {{ opacity: 0; transform: translateY(-8px); }}"
+        f"  0%, 36% {{ opacity: 0; transform: translateY(12px); }}"
+        f"  40%, 84% {{ opacity: 1; transform: translateY(0px); }}"
+        f"  88%, 100% {{ opacity: 0; transform: translateY(-8px); }}"
         f"}}",
     ]
 
@@ -578,15 +578,16 @@ def make_game(days, total, best):
     win("phase2", 19, 36)
     win("phase3", 37, 43)
 
-    N, S0, S1 = 12, 52.0, 68.0
+    # Roll-up angka bintang di panel laporan kiri
+    N, S0, S1 = 12, 44.0, 62.0
     layers = []
     for k in range(N + 1):
         v = round(total * (1 - (1 - k / N) ** 2))
         a = S0 + k * (S1 - S0) / N
-        b = S0 + (k + 1) * (S1 - S0) / N if k < N else 94.0
-        end = f"{b:.2f}%,100%{{opacity:0}}" if k < N else "94%{opacity:1}98%,100%{opacity:0}"
+        b = S0 + (k + 1) * (S1 - S0) / N if k < N else 84.0
+        end = f"{b:.2f}%,100%{{opacity:0}}" if k < N else "84%{opacity:1}88%,100%{opacity:0}"
         css.append(kf(f"rk{k}", f"0%,{a:.2f}%{{opacity:0}}{a+0.01:.2f}%,{b-0.01:.2f}%{{opacity:1}}" + end))
-        layers.append(f'<text x="560" y="219" text-anchor="end" font-size="26" fill="{GOLD}" letter-spacing="2" '
+        layers.append(f'<text x="365" y="225" text-anchor="end" font-size="24" fill="{GOLD}" letter-spacing="2" '
                       f'style="opacity:0;animation:rk{k} {T}s linear infinite">{v:06d} ★</text>')
 
     grade = grade_for(total)
@@ -599,7 +600,7 @@ def make_game(days, total, best):
     <stop offset="55%" stop-color="{NAVY}"/>
     <stop offset="100%" stop-color="{DEEP}"/>
   </linearGradient>
-  <!-- Sinar senter kosmik menyorot ke atas ke arah bintang -->
+  <!-- Sinar senter kosmik menyorot langsung ke rasi bintang -->
   <linearGradient id="flashlight_glow" x1="0" y1="1" x2="0.65" y2="0">
     <stop offset="0%" stop-color="{CYAN}" stop-opacity="0.95"/>
     <stop offset="55%" stop-color="{SKY2}" stop-opacity="0.45"/>
@@ -613,7 +614,6 @@ def make_game(days, total, best):
   }}
   .flashlight-beam {{
     animation: flashlight_active {T}s ease-in-out infinite;
-    transform-origin: 0% 100%;
   }}
   .rcs-puff {{
     animation: rcs_thrust {T}s ease-in-out infinite;
@@ -650,7 +650,7 @@ def make_game(days, total, best):
 <!-- Garis panduan kosmik halus di bawah bintang (y=218) -->
 <line x1="40" y1="218" x2="860" y2="218" stroke="{NAVY}" stroke-width="1" stroke-dasharray="4 6" opacity="0.45"/>
 
-<!-- Astronot MENGAMBANG DI BAWAH bintang (y=180) memegang senter menyala sejak awal -->
+<!-- Astronot MENGAMBANG DI BAWAH bintang (y=180) dengan senter TERKUNCI di tangan -->
 <g transform="translate(0, 180)">
   <g class="floater-group">
     <!-- Tether Cable -->
@@ -666,10 +666,12 @@ def make_game(days, total, best):
     <!-- Sprite Astronot Mengambang memegang senter -->
     <g>{HERO_TORCH_S}</g>
 
-    <!-- Senter Kosmik MENYALA SEJAK AWAL (0%) menyorot ke atas ke rasi bintang -->
-    <g class="flashlight-beam" transform="translate(42, 22)">
-      <polygon points="0,0 280,-130 280,15" fill="url(#flashlight_glow)"/>
-      <line x1="0" y1="0" x2="280" y2="-65" stroke="{WHITE}" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <!-- Senter Kosmik: Terkunci di koordinat tangan (42, 26) tanpa transform CSS terpisah, menyorot langsung ke rasi bintang -->
+    <g transform="translate(42, 26)">
+      <g class="flashlight-beam">
+        <polygon points="0,0 260,-140 280,-30" fill="url(#flashlight_glow)"/>
+        <line x1="0" y1="0" x2="270" y2="-85" stroke="{WHITE}" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </g>
     </g>
   </g>
 </g>
@@ -681,33 +683,32 @@ def make_game(days, total, best):
 <text style="opacity:0;animation:phase2 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{CYAN}" letter-spacing="2">&gt; FLASHLIGHT BEAM ILLUMINATING DISCOVERED CONSTELLATION...</text>
 <text style="opacity:0;animation:phase3 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{SKY3}" letter-spacing="2">&gt; {total} STARS SYNCHRONIZED ACROSS {nblocks} CONSTELLATION NODES ★</text>
 
-<!-- Holographic Mission Result HUD Panel -->
+<!-- Holographic Mission Result HUD Panel (Berada di SEBELAH KIRI agar astronot di kanan tetap terlihat menyenter bintang) -->
 <g class="hud-panel" style="opacity:0;">
-  <rect width="{W}" height="{H}" fill="{DEEP}" opacity="0.88"/>
-  <rect x="230" y="50" width="440" height="206" fill="{NAVY}"/>
-  <rect x="232" y="52" width="436" height="202" fill="none" stroke="{BLUE}" stroke-width="3"/>
-  <rect x="238" y="58" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.4"/>
+  <rect x="50" y="52" width="420" height="206" fill="{NAVY}" opacity="0.92"/>
+  <rect x="52" y="54" width="416" height="202" fill="none" stroke="{BLUE}" stroke-width="3"/>
+  <rect x="58" y="60" width="404" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.4"/>
   
-  <path d="M232 62V52H242M658 52H668V62M232 244V254H242M658 254H668V244" stroke="{CYAN}" stroke-width="2" fill="none"/>
+  <path d="M52 64V54H62M462 54H472V64M52 246V256H62M462 256H472V246" stroke="{CYAN}" stroke-width="2" fill="none"/>
 
-  <text x="450" y="90" text-anchor="middle" font-size="22" fill="{GOLD}" letter-spacing="5">EXPEDITION REPORT</text>
+  <text x="260" y="92" text-anchor="middle" font-size="20" fill="{GOLD}" letter-spacing="5">EXPEDITION REPORT</text>
   
-  <text x="256" y="124" font-size="13" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
-  <text x="644" y="124" text-anchor="end" font-size="14" fill="#FFFFFF">{total} ★</text>
+  <text x="76" y="126" font-size="13" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
+  <text x="444" y="126" text-anchor="end" font-size="14" fill="#FFFFFF">{total} ★</text>
   
-  <text x="256" y="150" font-size="13" fill="{SKY3}" letter-spacing="1">ACTIVE STELLAR NODES</text>
-  <text x="644" y="150" text-anchor="end" font-size="14" fill="#FFFFFF">{nblocks} DAYS</text>
+  <text x="76" y="152" font-size="13" fill="{SKY3}" letter-spacing="1">ACTIVE STELLAR NODES</text>
+  <text x="444" y="152" text-anchor="end" font-size="14" fill="#FFFFFF">{nblocks} DAYS</text>
   
-  <text x="256" y="176" font-size="13" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
-  <text x="644" y="176" text-anchor="end" font-size="14" fill="#FFFFFF">{best} DAYS</text>
+  <text x="76" y="178" font-size="13" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
+  <text x="444" y="178" text-anchor="end" font-size="14" fill="#FFFFFF">{best} DAYS</text>
   
-  <path d="M256 192H644" stroke="{BLUE}" stroke-width="2" stroke-dasharray="6 4"/>
-  <text x="256" y="223" font-size="15" fill="#FFFFFF" letter-spacing="3">TOTAL STARS</text>
+  <path d="M76 194H444" stroke="{BLUE}" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="76" y="225" font-size="15" fill="#FFFFFF" letter-spacing="3">TOTAL STARS</text>
 
   {"".join(layers)}
 
-  <rect x="585" y="200" width="60" height="38" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
-  <text x="615" y="228" text-anchor="middle" font-size="26" fill="{gcol}">{grade}</text>
+  <rect x="385" y="202" width="58" height="36" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
+  <text x="414" y="229" text-anchor="middle" font-size="24" fill="{gcol}">{grade}</text>
 </g>
 </svg>
 '''

@@ -14,7 +14,6 @@
 </defs>
 <style>
   text { font-family: 'Courier New', Courier, monospace; font-weight: 700; }
-  /* Animasi melayang di tengah kiri dekat bintang suar */
   .spacewalk-float {
     animation: flight_relative 7s ease-in-out infinite;
   }
