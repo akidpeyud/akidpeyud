@@ -12,6 +12,7 @@ API gagal, file lain tetap terbuat.
 """
 import html
 import json
+import math
 import os
 import re
 import sys
@@ -306,81 +307,247 @@ def make_stats(total, cur, best, prof):
 
 
 # ───────────────────────── contribution game ─────────────────────────
-LEVEL_FILL = {0: "#10223C", 1: BLUE, 2: SKY1, 3: SKY2, 4: SKY3}
+COIN_S = sprite([
+    ".XX.", "XLXX", "XLXX", "XLXX", "XLXX", ".XX.",
+], {"X": GOLD, "L": GOLD_L}, 3)
+
+STONE = sprite([
+    ".XXX.", "XXLXX", "XLXXX", "XXXXX", ".XXX.",
+], {"X": "#8FA7BF", "L": PALE}, 4)
+
+LEVEL_FILL = {1: BLUE, 2: SKY1, 3: SKY2, 4: SKY3}
 
 
-def make_game(days, total):
-    W, H = 900, 270
+def grade_for(total):
+    for limit, g in ((1000, "S"), (600, "A"), (300, "B"), (100, "C")):
+        if total >= limit:
+            return g
+    return "D"
+
+
+def make_game(days, total, best):
+    """Satu putaran: hero melempar batu -> medan kontribusi meledak berantai -> layar hasil + skor."""
+    W, H, G, T = 900, 300, 262, 22
     cols = max(d[2] for d in days) + 1
-    pitch, size = 16, 13
-    gx = (W - cols * pitch) // 2 + 1
-    gy = 50
-    ground = 232
-    T = 28  # detik per putaran
-    run_end = 0.90
+    pitch, size, gx = 15, 13, 24
+    by_col = {c: sorted([l for (_, _, cc, l) in days if cc == c and l > 0], reverse=True) for c in range(cols)}
+    n = [len(by_col[c]) for c in range(cols)]
+    top = lambda c: G - n[c] * pitch
+    active = [c for c in range(cols) if n[c] > 0]
+    nblocks = sum(n)
 
-    x0 = gx - 8
-    x_end = gx + cols * pitch - 34
-    dist = x_end - x0
+    # titik tumbukan = kolom aktif terdekat dengan pusat massa
+    if active:
+        wsum = sum(n[c] for c in active)
+        mid = sum((gx + c * pitch + size / 2) * n[c] for c in active) / wsum
+        ic = min(active, key=lambda c: abs(gx + c * pitch + size / 2 - mid))
+        ix, iy = gx + ic * pitch + size / 2, top(ic) + 10
+    else:
+        ix, iy = W / 2, G - 10
 
-    keyframes, tiles = [], []
-    for c in range(cols):
+    seed = [20261101]
+
+    def rnd():
+        seed[0] = (seed[0] * 1103515245 + 12345) & 0x7FFFFFFF
+        return seed[0] / 0x7FFFFFFF
+
+    # ── timeline (persen dari T) ──
+    T_THROW, T_HIT = 8.0, 18.0
+    NB = 10                       # jumlah "gelombang" ledakan
+    WAVE0, WAVE_STEP = T_HIT, 0.8
+
+    def kf(name, body):
+        return "@keyframes %s{%s}" % (name, body)
+
+    css = []
+    for k in range(NB):
+        e = WAVE0 + k * WAVE_STEP
+        css.append(kf(f"bm{k}",
+            f"0%,{e:.1f}%{{transform:translate(0,0) rotate(0deg);opacity:1}}"
+            f"{e+2.5:.1f}%{{transform:translate(var(--hx),var(--hy)) rotate(var(--hr));opacity:1}}"
+            f"{e+8:.1f}%,97%{{transform:translate(var(--dx),var(--dy)) rotate(var(--dr));opacity:0}}"
+            f"100%{{transform:translate(0,0) rotate(0deg);opacity:1}}"))
+
+    dmax = 1.0
+    cells = []
+    for c in active:
+        for i, lvl in enumerate(by_col[c]):
+            bx, by = gx + c * pitch, top(c) + i * pitch
+            cells.append((c, i, lvl, bx, by, math.hypot(bx + size / 2 - ix, by + size / 2 - iy)))
+    if cells:
+        dmax = max(max(x[5] for x in cells), 1.0)
+
+    blocks, coins = [], []
+    for c, i, lvl, bx, by, dist in cells:
+        k = min(NB - 1, int(dist / dmax * NB))
+        ux, uy = (bx + size / 2 - ix) / max(dist, 1), (by + size / 2 - iy) / max(dist, 1)
+        sp = 40 + rnd() * 90
+        v = (f"--hx:{ux*sp*0.5:.0f}px;--hy:{uy*sp*0.5-30:.0f}px;--dx:{ux*sp*1.1+(rnd()-.5)*20:.0f}px;"
+             f"--dy:{G-by+40+rnd()*30:.0f}px;--hr:{(rnd()-.5)*240:.0f}deg;--dr:{(rnd()-.5)*720:.0f}deg")
+        blocks.append(
+            f'<g class="b" style="{v};animation:bm{k} {T}s linear infinite">'
+            f'<rect x="{bx}" y="{by}" width="{size}" height="{size}" fill="{LEVEL_FILL[lvl]}"/>'
+            f'<rect x="{bx+2}" y="{by+2}" width="3" height="3" fill="#FFFFFF" opacity="0.5"/>'
+            + (f'<rect x="{bx}" y="{by}" width="{size}" height="3" fill="{PALE}" opacity="0.75"/>' if i == 0 else "")
+            + "</g>")
+    for c in active:
         cx = gx + c * pitch + size / 2
-        p = max(0.0, (cx - 15 - x0) / dist)
-        a = min(p * run_end * 100, 93.0)
-        keyframes.append(
-            f"@keyframes c{c}{{0%,{a:.2f}%{{opacity:1;transform:translateY(0)}}"
-            f"{a+0.8:.2f}%,97%{{opacity:0;transform:translateY(-14px)}}100%{{opacity:1;transform:translateY(0)}}}}"
-        )
-    for d, r, c, lvl in days:
-        x, y = gx + c * pitch, gy + r * pitch
-        if lvl == 0:
-            tiles.append(f'<rect x="{x}" y="{y}" width="{size}" height="{size}" fill="{LEVEL_FILL[0]}" stroke="{NAVY}" stroke-width="1"/>')
-    cols_svg = []
-    for c in range(cols):
-        inner = ""
-        for d, r, cc, lvl in days:
-            if cc != c or lvl == 0:
-                continue
-            x, y = gx + c * pitch, gy + r * pitch
-            inner += (
-                f'<rect x="{x}" y="{y}" width="{size}" height="{size}" fill="{LEVEL_FILL[lvl]}"/>'
-                f'<rect x="{x+2}" y="{y+2}" width="3" height="3" fill="#FFFFFF" opacity="0.55"/>'
-            )
-        if inner:
-            cols_svg.append(f'<g style="animation:c{c} {T}s linear infinite">{inner}</g>')
+        d = math.hypot(cx - ix, top(c) - 20 - iy)
+        k = min(NB - 1, int(d / dmax * NB))
+        ux = (cx - ix) / max(d, 1)
+        v = f"--hx:{ux*10:.0f}px;--hy:-26px;--dx:{ux*24:.0f}px;--dy:-72px;--hr:0deg;--dr:0deg"
+        coins.append(
+            f'<g class="b" style="{v};animation:bm{k} {T}s linear infinite">'
+            f'<g transform="translate({cx-6:.1f},{top(c)-31})">{COIN_S}</g></g>')
 
-    legend = "".join(
-        f'<rect x="{738+i*18}" y="12" width="13" height="13" fill="{LEVEL_FILL[i]}"/>' for i in range(5)
-    )
-    hero_y = ground - 42
+    # ── lemparan batu (parabola) ──
+    xs, ys, xe, ye = 60 + 36, G - 38, ix, iy - 6
+    arc = 130
+    fly = [f"0%,{T_THROW-0.1:.1f}%{{opacity:0;transform:translate({xs}px,{ys}px)}}"]
+    for j in range(15):
+        t = j / 14
+        x = xs + (xe - xs) * t
+        y = ys + (ye - ys) * t - 4 * arc * t * (1 - t)
+        fly.append(f"{T_THROW + (T_HIT - T_THROW) * t:.2f}%{{opacity:1;transform:translate({x:.1f}px,{y:.1f}px)}}")
+    fly.append(f"{T_HIT+0.05:.2f}%,100%{{opacity:0;transform:translate({xe:.1f}px,{ye:.1f}px)}}")
+    css.append(kf("fly", "".join(fly)))
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Contribution graph as a pixel game">
+    # ── hero, efek ledakan, status ──
+    css.append(kf("hero",
+        "0%,5%{transform:translate(0,0)}7%{transform:translate(-5px,0)}9%{transform:translate(6px,0)}"
+        "11%,24%{transform:translate(0,0)}26.5%{transform:translate(0,-14px)}29%{transform:translate(0,0)}"
+        "31.5%{transform:translate(0,-14px)}34%,100%{transform:translate(0,0)}"))
+    css.append(kf("spin", "to{transform:rotate(720deg)}"))
+    css.append(kf("shake",
+        f"0%,{T_HIT}%{{transform:translate(0,0)}}{T_HIT+0.4}%{{transform:translate(-4px,3px)}}"
+        f"{T_HIT+0.8}%{{transform:translate(4px,-3px)}}{T_HIT+1.2}%{{transform:translate(-3px,-2px)}}"
+        f"{T_HIT+1.6}%{{transform:translate(3px,2px)}}{T_HIT+2.2}%,100%{{transform:translate(0,0)}}"))
+    css.append(kf("flash", f"0%,{T_HIT}%{{opacity:0;transform:scale(.2)}}{T_HIT+0.3}%{{opacity:1;transform:scale(.7)}}"
+                           f"{T_HIT+2.5}%,100%{{opacity:0;transform:scale(2.4)}}"))
+    css.append(kf("ring1", f"0%,{T_HIT}%{{opacity:0;transform:scale(.2)}}{T_HIT+0.3}%{{opacity:1;transform:scale(.4)}}"
+                           f"{T_HIT+9}%,100%{{opacity:0;transform:scale(5)}}"))
+    css.append(kf("ring2", f"0%,{T_HIT+1}%{{opacity:0;transform:scale(.2)}}{T_HIT+1.4}%{{opacity:1;transform:scale(.4)}}"
+                           f"{T_HIT+11}%,100%{{opacity:0;transform:scale(4)}}"))
+    css.append(kf("spark", f"0%,{T_HIT}%{{opacity:0;transform:translate(0,0)}}{T_HIT+0.2}%{{opacity:1;transform:translate(0,0)}}"
+                           f"{T_HIT+7}%,100%{{opacity:0;transform:translate(var(--sx),var(--sy))}}"))
+
+    def window(name, a, b):
+        css.append(kf(name, f"0%,{a}%{{opacity:0}}{a+0.8}%,{b}%{{opacity:1}}{b+0.8}%,100%{{opacity:0}}"))
+
+    window("s1", 0, 7.5)
+    window("s2", 8, 17.5)
+    window("s3", 18, 36)
+    OV = 38
+    css.append(kf("ov", f"0%,{OV}%{{opacity:0}}{OV+3}%,94%{{opacity:1}}98%,100%{{opacity:0}}"))
+    css.append(kf("fadeA", "0%,41%{opacity:0}42.5%,94%{opacity:1}98%,100%{opacity:0}"))
+    css.append(kf("fadeB", "0%,44%{opacity:0}45.5%,94%{opacity:1}98%,100%{opacity:0}"))
+    css.append(kf("fadeC", "0%,47%{opacity:0}48.5%,94%{opacity:1}98%,100%{opacity:0}"))
+    css.append(kf("fadeD", "0%,50%{opacity:0}51.5%,94%{opacity:1}98%,100%{opacity:0}"))
+    css.append(kf("pop", "0%,73%{opacity:0;transform:scale(2.2)}75%{opacity:1;transform:scale(.88)}"
+                         "77%,94%{opacity:1;transform:scale(1)}98%,100%{opacity:0;transform:scale(1)}"))
+
+    # hitung-naik skor
+    N, S0, S1 = 14, 56.0, 70.0
+    layers = []
+    for k in range(N + 1):
+        v = round(total * (1 - (1 - k / N) ** 2))
+        a = S0 + k * (S1 - S0) / N
+        b = S0 + (k + 1) * (S1 - S0) / N if k < N else 94.0
+        end = f"{b:.2f}%,100%{{opacity:0}}" if k < N else "94%{opacity:1}98%,100%{opacity:0}"
+        css.append(kf(f"v{k}", f"0%,{a:.2f}%{{opacity:0}}{a+0.01:.2f}%,{b-0.01:.2f}%{{opacity:1}}" + end))
+        layers.append(f'<text x="560" y="219" text-anchor="end" font-size="26" fill="{GOLD}" letter-spacing="2" '
+                      f'style="opacity:0;animation:v{k} {T}s linear infinite">{v:06d}</text>')
+
+    # percikan
+    sparks = []
+    for j in range(12):
+        ang = j / 12 * 2 * math.pi
+        dist = 50 + rnd() * 70
+        sparks.append(f'<rect x="{ix-3:.1f}" y="{iy-3:.1f}" width="6" height="6" fill="{GOLD if j%2 else "#FFFFFF"}" '
+                      f'style="--sx:{math.cos(ang)*dist:.0f}px;--sy:{math.sin(ang)*dist-10:.0f}px;opacity:0;animation:spark {T}s linear infinite"/>')
+
+    # bintang latar
+    stars = []
+    for _ in range(34):
+        sx = int(rnd() * W)
+        sy = 42 + int(rnd() * 110)
+        stars.append(f'<rect x="{sx}" y="{sy}" width="3" height="3" fill="{PALE}" opacity="0.35"/>')
+
+    grade = grade_for(total)
+    gcol = {"S": GOLD, "A": SKY3, "B": SKY2, "C": SKY1, "D": PALE}[grade]
+    A = lambda cls, extra="": f'class="{cls}" style="opacity:0;animation:{cls} {T}s linear infinite{extra}"'
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Contribution graph as a pixel game: throw a stone, blow up the blocks, see your score">
 <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{DEEP}"/><stop offset="1" stop-color="{NAVY}"/></linearGradient></defs>
 <style>
   {FONT}
-  .run  {{ animation: run {T}s linear infinite; }}
-  .hop  {{ animation: hop {T*run_end/14:.3f}s ease-in-out infinite; }}
-  .blink {{ animation: blink 1.1s steps(1) infinite; }}
-  @keyframes run {{ 0% {{ transform: translateX(0); }} {run_end*100:.0f}%,100% {{ transform: translateX({dist}px); }} }}
-  @keyframes hop {{ 0%,45% {{ transform: translateY(0); }} 65% {{ transform: translateY(-40px); }} 85%,100% {{ transform: translateY(0); }} }}
-  @keyframes blink {{ 0%,50% {{ opacity: 1; }} 50.01%,100% {{ opacity: 0; }} }}
-  {"".join(keyframes)}
+  .b, .spin, .fx, .grade {{ transform-box: fill-box; transform-origin: center; }}
+  .scene {{ animation: shake {T}s linear infinite; }}
+  .hero  {{ animation: hero {T}s linear infinite; }}
+  .stone {{ opacity: 0; animation: fly {T}s linear infinite; }}
+  .spin  {{ animation: spin 0.6s linear infinite; }}
+  .flash {{ opacity: 0; animation: flash {T}s linear infinite; }}
+  .ring1 {{ opacity: 0; animation: ring1 {T}s linear infinite; }}
+  .ring2 {{ opacity: 0; animation: ring2 {T}s linear infinite; }}
+  .cl1 {{ animation: drift 14s ease-in-out infinite alternate; }}
+  .cl2 {{ animation: drift 18s ease-in-out infinite alternate-reverse; }}
+  @keyframes drift {{ from {{ transform: translateX(0); }} to {{ transform: translateX(50px); }} }}
+  {"".join(css)}
 </style>
 <rect width="{W}" height="{H}" fill="url(#bg)"/>
+{"".join(stars)}
+<g class="cl1" opacity="0.18" transform="translate(120,56)"><g>{CLOUD}</g></g>
+<g class="cl2" opacity="0.14" transform="translate(520,70)"><g>{CLOUD}</g></g>
+{hill(40, 4, 220, 20, 12, G, "#16304F")}
+{hill(360, 5, 300, 20, 12, G, "#16304F")}
+
 <rect width="{W}" height="34" fill="{DEEP}" opacity="0.7"/>
 <text x="20" y="22" font-size="13" fill="#FFFFFF" letter-spacing="2">CONTRIBUTION QUEST</text>
-<text x="330" y="22" font-size="13" fill="{GOLD}" letter-spacing="2">SCORE {total:06d}</text>
-<text x="728" y="22" text-anchor="end" font-size="11" fill="{SKY3}" letter-spacing="2">LESS</text>
-{legend}
-<text x="832" y="22" font-size="11" fill="{SKY3}" letter-spacing="2">MORE</text>
+<text x="880" y="22" text-anchor="end" font-size="13" fill="{GOLD}" letter-spacing="2">TARGET: {nblocks} BLOCKS</text>
 
-{"".join(tiles)}
-{"".join(cols_svg)}
+<g class="scene">
+{"".join(blocks)}
+{"".join(coins)}
+<g transform="translate(60,{G-42})"><g class="hero">{HERO_S}</g></g>
+<g class="stone"><g class="spin"><g transform="translate(-10,-10)">{STONE}</g></g></g>
+</g>
 
-<g class="run"><g class="hop"><g transform="translate({x0},{hero_y})">{HERO_S}</g></g></g>
-<text class="blink" x="{W-20}" y="{ground-14}" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">COLLECTING...</text>
-{ground_tiles(W, ground, rows=1)}
+<circle class="flash fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="#FFFFFF"/>
+<circle class="ring1 fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="none" stroke="{SKY3}" stroke-width="5"/>
+<circle class="ring2 fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="none" stroke="{GOLD}" stroke-width="4"/>
+{"".join(sparks)}
+
+{ground_tiles(W, G, rows=1)}
+<text style="opacity:0;animation:s1 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">READY...</text>
+<text style="opacity:0;animation:s2 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">THROW!</text>
+<text style="opacity:0;animation:s3 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">BOOM!</text>
+
+<g style="opacity:0;animation:ov {T}s linear infinite">
+  <rect width="{W}" height="{H}" fill="{DEEP}" opacity="0.82"/>
+  <rect x="230" y="46" width="440" height="206" fill="{NAVY}"/>
+  <rect x="232" y="48" width="436" height="202" fill="none" stroke="{BLUE}" stroke-width="4"/>
+  <rect x="238" y="54" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.35"/>
+</g>
+<text {A("fadeA")} x="450" y="86" text-anchor="middle" font-size="24" fill="{GOLD}" letter-spacing="6">RESULT</text>
+<g {A("fadeB")}>
+  <text x="256" y="120" font-size="14" fill="{SKY3}" letter-spacing="1">CONTRIBUTIONS</text>
+  <text x="644" y="120" text-anchor="end" font-size="15" fill="#FFFFFF">{total}</text>
+</g>
+<g {A("fadeC")}>
+  <text x="256" y="146" font-size="14" fill="{SKY3}" letter-spacing="1">BLOCKS DESTROYED</text>
+  <text x="644" y="146" text-anchor="end" font-size="15" fill="#FFFFFF">{nblocks}</text>
+</g>
+<g {A("fadeD")}>
+  <text x="256" y="172" font-size="14" fill="{SKY3}" letter-spacing="1">BEST STREAK</text>
+  <text x="644" y="172" text-anchor="end" font-size="15" fill="#FFFFFF">{best} DAYS</text>
+  <path d="M256 188H644" stroke="{BLUE}" stroke-width="3" stroke-dasharray="6 4"/>
+  <text x="256" y="219" font-size="16" fill="#FFFFFF" letter-spacing="3">SCORE</text>
+</g>
+{"".join(layers)}
+<g class="grade" style="opacity:0;animation:pop {T}s linear infinite">
+  <rect x="590" y="198" width="54" height="40" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
+  <text x="617" y="228" text-anchor="middle" font-size="30" fill="{gcol}">{grade}</text>
+</g>
 </svg>
 '''
 
@@ -397,7 +564,7 @@ def main():
     if contrib:
         days, total = contrib
         cur, best = streaks(days)
-        (OUT / "contrib-game.svg").write_text(make_game(days, total), encoding="utf-8")
+        (OUT / "contrib-game.svg").write_text(make_game(days, total, best), encoding="utf-8")
     else:
         total, cur, best = 0, 0, 0
 
