@@ -14,6 +14,7 @@ import math
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -209,14 +210,16 @@ def get_profile():
     stars = sum(r.get("stargazers_count", 0) for r in own)
 
     quest = None
+    recent_quests = []
     now = datetime.now(timezone.utc)
     for r in own:
         if r["name"].lower() == USER.lower():
             continue
         pushed = datetime.fromisoformat(r["pushed_at"].replace("Z", "+00:00"))
         if (now - pushed).days <= QUEST_MAX_AGE_DAYS:
-            quest = r["name"]
-        break
+            if not quest:
+                quest = r["name"]
+            recent_quests.append(r["name"])
 
     langs = {}
     for r in [x for x in own if x["name"].lower() != USER.lower()][:25]:
@@ -231,6 +234,7 @@ def get_profile():
         "followers": u.get("followers", 0),
         "stars": stars,
         "quest": quest,
+        "recent_quests": recent_quests,
         "langs": langs,
     }
 
@@ -714,6 +718,69 @@ def make_game(days, total, best):
 '''
 
 
+# ───────────────────────── update readme ─────────────────────────
+def update_readme(prof):
+    readme_path = Path(__file__).resolve().parent.parent / "README.md"
+    if not readme_path.exists():
+        return
+
+    content = readme_path.read_text(encoding="utf-8")
+
+    # Format quest name from active repos
+    recent_quests = prof.get("recent_quests", [])
+    if recent_quests:
+        clean_names = [q.replace("_", "-").strip() for q in recent_quests[:2]]
+        quest_display = " & ".join(clean_names)
+    elif prof.get("quest"):
+        quest_display = prof["quest"].replace("_", "-").strip()
+    else:
+        quest_display = QUEST_FALLBACK.replace("-", " ").replace("_", " ").title().strip()
+
+    # Determine primary tech stack from langs
+    langs = prof.get("langs", {})
+    sorted_langs = [k for k, _ in sorted(langs.items(), key=lambda x: x[1], reverse=True)]
+    tech_candidates = []
+    has_blade = "Blade" in langs or "PHP" in langs
+    if has_blade:
+        tech_candidates.append("Laravel")
+        tech_candidates.append("PHP")
+    for lang in sorted_langs:
+        if lang not in ("Blade", "HTML", "CSS") and lang not in tech_candidates:
+            tech_candidates.append(lang)
+    top_tech = ", ".join(tech_candidates[:3]) if tech_candidates else "Laravel, PHP & Python"
+
+    lines = [
+        "Incoming Transmission... Greetings Explorer! 📡",
+        "Stellar Explorer & Full-Stack Astronaut 🧑‍🚀",
+        f"Crafting Systems: {top_tech} ⚡",
+        f"Active Quests: {quest_display} 🚀",
+        "Navigating the Infinite Digital Cosmos ✨",
+    ]
+
+    encoded_lines = ";".join(urllib.parse.quote_plus(line) for line in lines)
+    typing_url = (
+        f"https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=13&pause=1200"
+        f"&color=3D8BCB&center=true&vCenter=true&width=750&height=45&lines={encoded_lines}"
+    )
+
+    # 1. Update typing svg hero banner in README
+    content = re.sub(
+        r'<img src="https://readme-typing-svg\.demolab\.com\?[^"]*" alt="Typing SVG" />',
+        f'<img src="{typing_url}" alt="Typing SVG" />',
+        content,
+    )
+
+    # 2. Update Current Mission in Astronaut Profile table
+    content = re.sub(
+        r'(\|\s*🔭\s*\*\*Current Mission\*\*\s*\|\s*)([^|]+)(\|)',
+        rf'\g<1>{quest_display} \g<3>',
+        content,
+    )
+
+    readme_path.write_text(content, encoding="utf-8")
+    print(f"ok: readme updated with quest='{quest_display}', tech='{top_tech}'")
+
+
 # ───────────────────────── main ─────────────────────────
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
@@ -721,7 +788,7 @@ def main():
     contrib = safe(get_contributions, None, "kontribusi")
     prof = safe(get_profile, None, "profil/API")
     if prof is None:
-        prof = {"repos": 0, "followers": 0, "stars": 0, "quest": None, "langs": {}}
+        prof = {"repos": 0, "followers": 0, "stars": 0, "quest": None, "recent_quests": [], "langs": {}}
 
     if contrib:
         days, total = contrib
@@ -732,6 +799,7 @@ def main():
 
     (OUT / "banner.svg").write_text(make_banner(total, prof["repos"], clean_quest(prof["quest"])), encoding="utf-8")
     (OUT / "stats.svg").write_text(make_stats(total, cur, best, prof), encoding="utf-8")
+    safe(lambda: update_readme(prof), None, "update readme")
     print(f"ok: score={total} repos={prof['repos']} quest={clean_quest(prof['quest'])}")
 
 
