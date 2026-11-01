@@ -2,7 +2,7 @@ name: Update Pixel Profile
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # otomatis tiap 3 jam
+    - cron: "0 * * * *" # otomatis tiap 1 jam
   workflow_dispatch: # bisa dijalankan manual dari tab Actions
   push:
     branches: [main]
@@ -34,7 +34,7 @@ jobs:
           GH_USER: ${{ github.repository_owner }}
           # dipakai kalau repo terakhir yang di-push sudah lama / privat
           QUEST_FALLBACK: "SIMERAH KOJA"
-          QUEST_MAX_AGE_DAYS: "21"
+          QUEST_MAX_AGE_HOURS: "1"
         run: python scripts/generate.py
 
       - name: Commit perubahan

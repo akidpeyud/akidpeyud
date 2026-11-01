@@ -22,7 +22,7 @@ from pathlib import Path
 USER = os.environ.get("GH_USER", "akidpeyud")
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 QUEST_FALLBACK = os.environ.get("QUEST_FALLBACK", "SIMERAH KOJA")
-QUEST_MAX_AGE_DAYS = int(os.environ.get("QUEST_MAX_AGE_DAYS", "21"))
+QUEST_MAX_AGE_HOURS = float(os.environ.get("QUEST_MAX_AGE_HOURS", "1"))
 OUT = Path(__file__).resolve().parent.parent / "assets"
 
 # ── Color Palette: 2 warna utama (#1B365D & #005A9C) dipertahankan ──
@@ -216,7 +216,7 @@ def get_profile():
         if r["name"].lower() == USER.lower():
             continue
         pushed = datetime.fromisoformat(r["pushed_at"].replace("Z", "+00:00"))
-        if (now - pushed).days <= QUEST_MAX_AGE_DAYS:
+        if (now - pushed).total_seconds() <= QUEST_MAX_AGE_HOURS * 3600:
             if not quest:
                 quest = r["name"]
             recent_quests.append(r["name"])
@@ -353,7 +353,7 @@ def make_banner(score, coins, quest):
 <!-- Top Sci-Fi Navigation HUD Bar -->
 <rect x="12" y="12" width="{W-24}" height="30" fill="{DEEP}" opacity="0.9"/>
 <line x1="12" y1="42" x2="{W-12}" y2="42" stroke="{BLUE}" stroke-width="1"/>
-<text x="26" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">[ PILOT // AKID ]</text>
+<text x="26" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">[ CODENAME : AKID ]</text>
 <text x="220" y="32" font-size="12" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {score:06d}</text>
 <text x="540" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">SYSTEMS: x{coins:02d}</text>
 <text x="872" y="32" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
