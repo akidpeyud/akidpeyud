@@ -4,7 +4,7 @@ Generator aset pixel-art untuk profil GitHub: Stellar Explorer (Penjelajah Binta
 Menghasilkan 3 file SVG di folder assets/:
   - banner.svg        : Astronot melayang bebas di tengah kiri dekat bintang suar
   - stats.svg         : Logbook navigasi antariksa & telemetri sistem
-  - contrib-game.svg  : Astronot berjalan di bawah rasi bintang sambil menyenter ke atas ke arah bintang
+  - contrib-game.svg  : Astronot mengambang bebas di luar angkasa memegang senter dari awal dan menyorot rasi bintang
 
 Hanya memakai pustaka standar Python.
 """
@@ -78,42 +78,24 @@ def sprite(grid, colors, px):
 
 
 # ───────────────────────── pixel sprites ─────────────────────────
-ASTRONAUT_UPPER = [
-    "...WWWWWW.......",
-    "..WWWWWWWW......",
-    ".WWVVVVVVOOW....",
-    ".WWLVVVVVOOW....",
-    ".WWVVVVVVOOW....",
-    "..WWWWWWWW......",
-    "BBWWWWWWWWWW....",
-    "BBWRBWWWWWWWW...",
-    "BBWWWWWWWW.WW...",
-    ".BBDDDDDD...C...",
-    "..WWWWWWWW......",
-]
-
-ASTRONAUT_FLY_GRID = ASTRONAUT_UPPER + [
-    "..WWWW..WWWW....",
-    "..WWW....WWW....",
-    "..SSS....SSS....",
-    ".DDDD....DDDD...",
-    "................",
-]
-
-ASTRONAUT_WALK_A_GRID = ASTRONAUT_UPPER + [
-    "..WWWW..WW......",
-    ".WWWW....WW.....",
-    ".SSSS....SS.....",
-    "DDDDD....DDDD...",
-    "................",
-]
-
-ASTRONAUT_WALK_B_GRID = ASTRONAUT_UPPER + [
-    "....WW..WWWW....",
-    "....WW....WWWW..",
-    "....SS....SSSS..",
-    "...DDDD....DDDDD",
-    "................",
+# Astronot melayang bebas di antariksa sambil memegang senter di tangan
+ASTRONAUT_TORCH_GRID = [
+    "...WWWWWW.......",  # 0
+    "..WWWWWWWW......",  # 1
+    ".WWVVVVVVOOW....",  # 2
+    ".WWLVVVVVOOW....",  # 3
+    ".WWVVVVVVOOW....",  # 4
+    "..WWWWWWWW......",  # 5
+    "BBWWWWWWWWWW....",  # 6
+    "BBWRBWWWWWWWW...",  # 7
+    "BBWWWWWWWW.WWW..",  # 8 (tangan memegang senter)
+    ".BBDDDDDD...FFC.",  # 9 (badan senter F, lensa senter C)
+    "..WWWWWWWW...FC.",  # 10
+    "..WWWW..WWWW....",  # 11 (kaki mengambang zero-G)
+    "...WWW....WWW...",  # 12
+    "...SSS....SSS...",  # 13
+    "..DDDD....DDDD..",  # 14
+    "................",  # 15
 ]
 
 ASTRONAUT_COLORS = {
@@ -126,11 +108,11 @@ ASTRONAUT_COLORS = {
     "B": BLUE,
     "R": ORANGE,
     "C": CYAN,
+    "F": "#CBD5E1",
 }
 
-HERO_FLY = sprite(ASTRONAUT_FLY_GRID, ASTRONAUT_COLORS, 4)
-HERO_WALK_A = sprite(ASTRONAUT_WALK_A_GRID, ASTRONAUT_COLORS, 3)
-HERO_WALK_B = sprite(ASTRONAUT_WALK_B_GRID, ASTRONAUT_COLORS, 3)
+HERO_FLY = sprite(ASTRONAUT_TORCH_GRID, ASTRONAUT_COLORS, 4)
+HERO_TORCH_S = sprite(ASTRONAUT_TORCH_GRID, ASTRONAUT_COLORS, 3)
 
 RINGED_PLANET_GRID = [
     ".........BBBB.........",
@@ -374,21 +356,19 @@ def make_banner(score, coins, quest):
 <text x="540" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">SYSTEMS: x{coins:02d}</text>
 <text x="872" y="32" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
 
-<!-- Primary Pulsing Beacon Star (Tepat di tengah kiri pada y=125) -->
+<!-- Primary Pulsing Beacon Star (Tepat di tengah kiri pada y=110) -->
 <g transform="translate(240, 110)">
   <circle cx="15" cy="15" r="32" fill="url(#beacon_glow)"/>
   <g class="beacon-star" style="transform-origin: 15px 15px;">{STAR_LARGE}</g>
   <line x1="-50" y1="15" x2="0" y2="15" stroke="{CYAN}" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
 </g>
 
-<!-- Astronot di TENGAN KIRI dekat bintang (y=110, bukan di atas) -->
+<!-- Astronot di TENGAH KIRI dekat bintang (y=110) -->
 <g transform="translate(90, 110)">
   <g class="spacewalk-float">
-    <!-- Tether Cable connecting to starship -->
     <path d="M-65 35 C -35 15, -15 45, 6 30" fill="none" stroke="{SKY1}" stroke-width="2" opacity="0.5"/>
     <rect x="-70" y="33" width="6" height="6" fill="{BLUE}"/>
     
-    <!-- RCS Jetpack Thruster Flame Puff -->
     <g class="thruster" transform="translate(-10, 24)">
       <polygon points="0,6 -8,3 -8,9" fill="{CYAN}"/>
       <polygon points="0,6 -5,4 -5,8" fill="#FFFFFF"/>
@@ -396,13 +376,12 @@ def make_banner(score, coins, quest):
     
     <g>{HERO_FLY}</g>
     
-    <!-- Scanner Cone Beam pointing directly to Beacon Star -->
     <polygon points="66,36 145,20 145,52" fill="{CYAN}" opacity="0.14"/>
     <line x1="66" y1="36" x2="145" y2="36" stroke="{CYAN}" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.75"/>
   </g>
 </g>
 
-<!-- Right Side: Identification Terminal Card (Tepat di tengah pada y=56) -->
+<!-- Right Side: Identification Terminal Card -->
 <g transform="translate(420, 56)">
   <rect width="455" height="166" fill="{DEEP}" opacity="0.9"/>
   <rect x="2" y="2" width="451" height="162" fill="none" stroke="{NAVY}" stroke-width="2"/>
@@ -493,15 +472,15 @@ def grade_for(total):
 def make_game(days, total, best):
     """
     Stellar Expedition:
-    - Bintang-bintang bersumber 100% dari data kontribusi nyata Anda (gugusan aktif di kanan).
-    - Bagian bulan & hari dihapus total agar tampilan minimalis, clean, dan lapang.
-    - Astronot berada DI BAWAH bintang-bintang dan MENYENTER KE ATAS ke arah rasi bintang.
+    - Astronot MENGAMBANG bebas di luar angkasa (zero-G floating) di bawah rasi bintang.
+    - Senter dipegang dan menyala menyorot ke atas ke arah bintang SEJAK AWAL animasi (0%).
+    - Bersih tanpa label bulan & hari.
     """
     W, H = 900, 310
     T = 20  # Durasi siklus animasi dalam detik
     nblocks = sum(1 for d in days if d[3] > 0)
 
-    # Grid koordinat bintang (tanpa label bulan & hari, diletakkan bersih di atas)
+    # Grid koordinat rasi bintang
     gx, gy = 80, 68
     pitch_x, pitch_y = 14.2, 14.0
 
@@ -551,24 +530,32 @@ def make_game(days, total, best):
                 f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{SKY3}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.5"/>'
             )
 
-    # Target walking: berhenti tepat di bawah gugusan bintang aktif di kanan
-    target_walk_x = gx + 37 * pitch_x - 30
+    # Titik tujuan mengambang: tepat di bawah gugusan bintang aktif di kanan
+    target_float_x = gx + 37 * pitch_x - 30
 
     css = [
-        # Astronot berjalan di bawah bintang dari x=50 ke x=target
-        f"@keyframes astro_walk_beneath {{"
-        f"  0%   {{ transform: translateX(50px); }}"
-        f"  38%  {{ transform: translateX({target_walk_x:.0f}px); }}"
-        f"  65%  {{ transform: translateX({target_walk_x:.0f}px); }}"
-        f"  90%  {{ transform: translateX(50px); }}"
-        f"  100% {{ transform: translateX(50px); }}"
+        # Astronot MENGAMBANG di gravitasi nol menyusuri bawah rasi bintang
+        f"@keyframes astro_float_beneath {{"
+        f"  0%   {{ transform: translate(50px, 0px) rotate(0deg); }}"
+        f"  18%  {{ transform: translate({target_float_x*0.4:.0f}px, -10px) rotate(-4deg); }}"
+        f"  38%  {{ transform: translate({target_float_x:.0f}px, 2px) rotate(2deg); }}"
+        f"  50%  {{ transform: translate({target_float_x+10:.0f}px, -4px) rotate(-2deg); }}"
+        f"  65%  {{ transform: translate({target_float_x:.0f}px, 3px) rotate(1deg); }}"
+        f"  88%  {{ transform: translate(50px, -6px) rotate(-3deg); }}"
+        f"  100% {{ transform: translate(50px, 0px) rotate(0deg); }}"
         f"}}",
-        "@keyframes step_cycle { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }",
-        # Senter / scanner menyorot ke atas ke arah bintang
-        "@keyframes flashlight_beam {"
-        "  0%, 36% { opacity: 0; transform: scale(0.3); }"
-        "  40%, 63% { opacity: 0.95; transform: scale(1); }"
-        "  67%, 100% { opacity: 0; transform: scale(0.3); }"
+        # Senter MENYALA SEJAK AWAL (0%) dan semakin terang saat di gugusan bintang
+        "@keyframes flashlight_active {"
+        "  0%, 35%  { opacity: 0.75; transform: scale(0.92); }"
+        "  38%, 64% { opacity: 1.0; transform: scale(1.15); filter: drop-shadow(0 0 5px #67E8F9); }"
+        "  68%, 100%{ opacity: 0.75; transform: scale(0.92); }"
+        "}",
+        # Semburan kecil pendorong RCS saat mengambang
+        "@keyframes rcs_thrust {"
+        "  0%, 38%  { opacity: 0.85; transform: scale(1.1); }"
+        "  42%, 65% { opacity: 0.2; transform: scale(0.6); }"
+        "  70%, 95% { opacity: 0.85; transform: scale(1.1); }"
+        "  100%     { opacity: 0.4; }"
         "}",
         "@keyframes star_glow {"
         "  0%, 100% { opacity: 0.8; }"
@@ -613,26 +600,23 @@ def make_game(days, total, best):
     <stop offset="100%" stop-color="{DEEP}"/>
   </linearGradient>
   <!-- Sinar senter kosmik menyorot ke atas ke arah bintang -->
-  <linearGradient id="flashlight_glow" x1="0" y1="1" x2="0.6" y2="0">
+  <linearGradient id="flashlight_glow" x1="0" y1="1" x2="0.65" y2="0">
     <stop offset="0%" stop-color="{CYAN}" stop-opacity="0.95"/>
-    <stop offset="60%" stop-color="{SKY2}" stop-opacity="0.45"/>
+    <stop offset="55%" stop-color="{SKY2}" stop-opacity="0.45"/>
     <stop offset="100%" stop-color="{GOLD}" stop-opacity="0"/>
   </linearGradient>
 </defs>
 <style>
   {FONT}
-  .walker-group {{
-    animation: astro_walk_beneath {T}s ease-in-out infinite;
-  }}
-  .step-a {{
-    animation: step_cycle 0.4s steps(1) infinite;
-  }}
-  .step-b {{
-    animation: step_cycle 0.4s steps(1) infinite reverse;
+  .floater-group {{
+    animation: astro_float_beneath {T}s ease-in-out infinite;
   }}
   .flashlight-beam {{
-    animation: flashlight_beam {T}s ease-in-out infinite;
+    animation: flashlight_active {T}s ease-in-out infinite;
     transform-origin: 0% 100%;
+  }}
+  .rcs-puff {{
+    animation: rcs_thrust {T}s ease-in-out infinite;
   }}
   .star-cluster {{
     animation: star_glow 2.5s ease-in-out infinite alternate;
@@ -663,27 +647,28 @@ def make_game(days, total, best):
 <!-- The Discovered Stars Matrix (Bersih tanpa teks bulan & hari) -->
 <g class="star-cluster">{"".join(star_nodes)}</g>
 
-<!-- Luminous Celestial Pathway / Starlight Bridge (y=226) -->
-<rect x="30" y="226" width="840" height="4" fill="{BLUE}"/>
-<rect x="30" y="226" width="840" height="1" fill="{SKY3}"/>
-<!-- Pathway tick marks -->
-<path d="M50 230V234M120 230V234M190 230V234M260 230V234M330 230V234M400 230V234M470 230V234M540 230V234M610 230V234M680 230V234M750 230V234M820 230V234" stroke="{NAVY}" stroke-width="2"/>
-<rect x="30" y="230" width="840" height="10" fill="{DEEP}" opacity="0.6"/>
+<!-- Garis panduan kosmik halus di bawah bintang (y=218) -->
+<line x1="40" y1="218" x2="860" y2="218" stroke="{NAVY}" stroke-width="1" stroke-dasharray="4 6" opacity="0.45"/>
 
-<!-- Astronot DI BAWAH bintang-bintang (y=178) menyenter ke atas ke arah bintang -->
-<g transform="translate(0, 178)">
-  <g class="walker-group">
-    <!-- Navigation Tether -->
+<!-- Astronot MENGAMBANG DI BAWAH bintang (y=180) memegang senter menyala sejak awal -->
+<g transform="translate(0, 180)">
+  <g class="floater-group">
+    <!-- Tether Cable -->
     <path d="M-35 25 C -15 15, -5 30, 4 20" fill="none" stroke="{SKY1}" stroke-width="1.5" opacity="0.5"/>
     <rect x="-38" y="23" width="5" height="5" fill="{BLUE}"/>
 
-    <!-- Animated Walking Legs -->
-    <g class="step-a">{HERO_WALK_A}</g>
-    <g class="step-b">{HERO_WALK_B}</g>
+    <!-- RCS Jetpack Thruster Flame Puff saat mengambang -->
+    <g class="rcs-puff" transform="translate(-10, 20)">
+      <polygon points="0,5 -7,2 -7,8" fill="{CYAN}"/>
+      <polygon points="0,5 -4,3 -4,7" fill="#FFFFFF"/>
+    </g>
 
-    <!-- Senter Kosmik menyorot KE ATAS ke arah gugusan bintang -->
-    <g class="flashlight-beam" transform="translate(46, 18)">
-      <polygon points="0,0 280,-125 280,10" fill="url(#flashlight_glow)"/>
+    <!-- Sprite Astronot Mengambang memegang senter -->
+    <g>{HERO_TORCH_S}</g>
+
+    <!-- Senter Kosmik MENYALA SEJAK AWAL (0%) menyorot ke atas ke rasi bintang -->
+    <g class="flashlight-beam" transform="translate(42, 22)">
+      <polygon points="0,0 280,-130 280,15" fill="url(#flashlight_glow)"/>
       <line x1="0" y1="0" x2="280" y2="-65" stroke="{WHITE}" stroke-width="1.5" stroke-dasharray="3 3"/>
     </g>
   </g>
@@ -692,7 +677,7 @@ def make_game(days, total, best):
 <!-- Dynamic Status Telemetry (Bottom) -->
 <rect x="12" y="{H-32}" width="{W-24}" height="22" fill="{DEEP}" opacity="0.92"/>
 <line x1="12" y1="{H-32}" x2="{W-12}" y2="{H-32}" stroke="{NAVY}" stroke-width="1"/>
-<text style="opacity:0;animation:phase1 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{GOLD}" letter-spacing="2">&gt; PILOT WALKING TOWARDS UNCHARTED SPACE...</text>
+<text style="opacity:0;animation:phase1 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{GOLD}" letter-spacing="2">&gt; PILOT FLOATING THROUGH UNCHARTED SPACE WITH FLASHLIGHT...</text>
 <text style="opacity:0;animation:phase2 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{CYAN}" letter-spacing="2">&gt; FLASHLIGHT BEAM ILLUMINATING DISCOVERED CONSTELLATION...</text>
 <text style="opacity:0;animation:phase3 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{SKY3}" letter-spacing="2">&gt; {total} STARS SYNCHRONIZED ACROSS {nblocks} CONSTELLATION NODES ★</text>
 
