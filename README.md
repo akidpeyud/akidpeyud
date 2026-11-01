@@ -22,12 +22,12 @@
 
 <div align="center">
 
-|                      |                                                                        |
-| :------------------- | :--------------------------------------------------------------------- |
-| 🔭 **Current Quest** | Simerah Koja                                                           |
-| 🌱 **Learning**      | Laravel                                                                |
-| 📫 **Contact**       | dwiputdika@gmail.com                                                   |
-| ⚡ **Fun fact**      | Suka main _Wuthering Waves_, dan Pokémon favoritku adalah **Zorua** 🦊 |
+| | |
+|:---|:---|
+| 🔭 **Current Quest** | Simerah Koja |
+| 🌱 **Learning** | Laravel |
+| 📫 **Contact** | dwiputdika@gmail.com |
+| ⚡ **Fun fact** | Suka main *Wuthering Waves*, dan Pokémon favoritku adalah **Zorua** 🦊 |
 
 </div>
 
@@ -54,12 +54,7 @@
 <h2 align="center">📊 Player Stats</h2>
 
 <p align="center">
-  <img height="170" src="https://github-readme-stats.vercel.app/api?username=akidpeyud&show_icons=true&hide_border=false&border_radius=0&bg_color=1B365D&border_color=005A9C&title_color=FFFFFF&text_color=D6E8F5&icon_color=4DA3E0&ring_color=4DA3E0" alt="GitHub Stats" />
-  <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=akidpeyud&layout=compact&hide_border=false&border_radius=0&bg_color=1B365D&border_color=005A9C&title_color=FFFFFF&text_color=D6E8F5" alt="Top Languages" />
-</p>
-
-<p align="center">
-  <img src="https://streak-stats.demolab.com?user=akidpeyud&background=1B365D&border=005A9C&stroke=005A9C&ring=4DA3E0&fire=4DA3E0&currStreakNum=FFFFFF&sideNums=FFFFFF&currStreakLabel=D6E8F5&sideLabels=D6E8F5&dates=A9C9E4&border_radius=0" alt="GitHub Streak" />
+  <img src="./assets/stats.svg" alt="Player stats and top languages" width="100%" />
 </p>
 
 <br/>
@@ -68,7 +63,7 @@
 <h2 align="center">🎮 Contribution Game</h2>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/akidpeyud/akidpeyud/output/github-snake.svg" alt="Snake eating my contributions" width="100%" />
+  <img src="./assets/contrib-game.svg" alt="Contribution graph as a pixel game" width="100%" />
 </p>
 
 <!-- ═══════════ FOOTER ═══════════ -->
