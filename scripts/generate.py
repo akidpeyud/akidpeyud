@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Generator aset pixel-art untuk profil GitHub dengan tema Pixel Astronaut.
-
+Generator aset pixel-art untuk profil GitHub dengan tema "Stellar Explorer" (Penjelajah Bintang).
 Menghasilkan 3 file SVG di folder assets/:
-  - banner.svg        : banner + HUD astronot di permukaan bulan (score = jumlah bintang yang ditemukan)
-  - stats.svg         : kartu "Astronaut Log" + "System Telemetry" bergaya pixel
-  - contrib-game.svg  : konstelasi bintang kontribusi di luar angkasa dengan astronaut meluncurkan probe
+  - banner.svg        : Astronot penjelajah bintang spacewalking di antariksa lepas (zero-G)
+  - stats.svg         : Logbook navigasi antariksa & telemetri sistem
+  - contrib-game.svg  : Peta konstelasi bintang nyata dari kontribusi GitHub dengan radar scanner
 
-Hanya memakai pustaka standar Python. Setiap bagian punya fallback.
+Hanya memakai pustaka standar Python.
 """
 import html
 import json
@@ -25,12 +24,12 @@ QUEST_FALLBACK = os.environ.get("QUEST_FALLBACK", "SIMERAH KOJA")
 QUEST_MAX_AGE_DAYS = int(os.environ.get("QUEST_MAX_AGE_DAYS", "21"))
 OUT = Path(__file__).resolve().parent.parent / "assets"
 
-# ── Color Palette: 2 warna utama lama (#1B365D & #005A9C) dipertahankan ──
+# ── Color Palette: 2 warna utama (#1B365D & #005A9C) dipertahankan ──
 NAVY, BLUE = "#1B365D", "#005A9C"
 
-# ── Palette Astronaut & Deep Space ──
-DEEP = "#0B111E"
-SPACE_MID = "#112240"
+# ── Palette Astronaut & Deep Cosmos ──
+DEEP = "#080E1A"
+SPACE_DARK = "#0D172A"
 SKY1, SKY2, SKY3 = "#2F8FD8", "#4DA3E0", "#7FC4FF"
 PALE = "#D6E8F5"
 GOLD, GOLD_L = "#FFD166", "#FFF0B8"
@@ -45,7 +44,7 @@ FONT = "text { font-family: 'Courier New', Courier, monospace; font-weight: 700;
 
 # ───────────────────────── util ─────────────────────────
 def http_get(url, api=False):
-    headers = {"User-Agent": "Mozilla/5.0 (pixel-profile-generator)"}
+    headers = {"User-Agent": "Mozilla/5.0 (stellar-profile-generator)"}
     if api:
         headers["Accept"] = "application/vnd.github+json"
         if TOKEN:
@@ -79,23 +78,24 @@ def sprite(grid, colors, px):
 
 
 # ───────────────────────── pixel sprites ─────────────────────────
-# Pixel Astronaut (14x15)
-ASTRONAUT_GRID = [
-    "...WWWWWW.....",
-    "..WWWWWWWW....",
-    ".WWVVVVVVOO...",
-    ".WWLVVVVVOO...",
-    ".WWVVVVVVOO...",
-    "..WWWWWWWW....",
-    "BBWWWWWWWWBB..",
-    "BBWRBWWWBWBB..",
-    "BBWWWWWWWWBB..",
-    ".BBDDDDDDBB...",
-    "..WWWWWWWW....",
-    "..WWW..WWW....",
-    "..WWW..WWW....",
-    "..SSS..SSS....",
-    ".DDDD..DDDD...",
+# Spacewalking Astronaut (16x16) - Floating in Zero-G holding a star scanner
+ASTRONAUT_FLOAT_GRID = [
+    "...WWWWWW.......",
+    "..WWWWWWWW......",
+    ".WWVVVVVVOOW....",
+    ".WWLVVVVVOOW....",
+    ".WWVVVVVVOOW....",
+    "..WWWWWWWW......",
+    "BBWWWWWWWWWW....",
+    "BBWRBWWWWWWWW...",
+    "BBWWWWWWWW.WW...",
+    ".BBDDDDDD...C...",
+    "..WWWWWWWW......",
+    "..WWWW..WWWW....",
+    "..WWW....WWW....",
+    "..SSS....SSS....",
+    ".DDDD....DDDD...",
+    "................",
 ]
 ASTRONAUT_COLORS = {
     "W": WHITE,
@@ -106,126 +106,65 @@ ASTRONAUT_COLORS = {
     "L": "#FFFDF0",
     "B": BLUE,
     "R": ORANGE,
+    "C": CYAN,
 }
 
-HERO = sprite(ASTRONAUT_GRID, ASTRONAUT_COLORS, 5)
-HERO_S = sprite(ASTRONAUT_GRID, ASTRONAUT_COLORS, 3)
+HERO_FLOAT = sprite(ASTRONAUT_FLOAT_GRID, ASTRONAUT_COLORS, 4)
+HERO_FLOAT_S = sprite(ASTRONAUT_FLOAT_GRID, ASTRONAUT_COLORS, 3)
 
-# Distant Planet Earth (14x14)
-PLANET_GRID = [
-    ".....BBBB.....",
-    "...BBBAAABBB..",
-    "..BBAAAAAAABB.",
-    ".BBAAAAWAAAABB",
-    ".BAAWWWWWAAABB",
-    "BBAAAWWWWAAABB",
-    "BBAAAAAWWAAABB",
-    "BBAAAAAAAWAABB",
-    "BBBBAAAWWAAABB",
-    ".BBBAAAAAAABB.",
-    ".BBBAAAAAABBB.",
-    "..BBBBBBBBBB..",
-    "...BBBBBBBB...",
-    ".....BBBB.....",
+# Ringed Exoplanet (22x12)
+RINGED_PLANET_GRID = [
+    ".........BBBB.........",
+    ".......BBAAAABBB......",
+    ".....BBAAAAAAAABBB....",
+    "....BBAAAAAAAAAABBB...",
+    "...BBAAAAAWAAAAAABBB..",
+    "RRRRRRRRRRRRRRRRRRRRRR",
+    "RRR..BBAAAAAAAABBB..RR",
+    "....BBAAAAAAAAAABBB...",
+    ".....BBAAAAAAAABBB....",
+    ".......BBAAAABBB......",
+    ".........BBBB.........",
+    "......................",
 ]
-PLANET = sprite(PLANET_GRID, {"B": BLUE, "A": NAVY, "W": SKY3}, 4)
+PLANET_RINGED = sprite(RINGED_PLANET_GRID, {"B": BLUE, "A": NAVY, "W": SKY3, "R": GOLD}, 4)
 
-# Orbiting Satellite (14x6)
-SATELLITE_GRID = [
-    "BB....WW....BB",
-    "BB....WW....BB",
-    "BBBBWWDDWWBBBB",
-    "BBBBWWDDWWBBBB",
-    "BB....WW....BB",
-    "BB....WW....BB",
+# Deep Space Observatory Satellite (18x7)
+TELESCOPE_GRID = [
+    "..BBBB......BBBB..",
+    "..BBBB......BBBB..",
+    "DDDDDDWWWWWWDDDDDD",
+    "DDDDDDWWCCWWDDDDDD",
+    "DDDDDDWWWWWWDDDDDD",
+    "..BBBB......BBBB..",
+    "..BBBB......BBBB..",
 ]
-SATELLITE = sprite(SATELLITE_GRID, {"B": BLUE, "W": SLATE, "D": GOLD}, 3)
+TELESCOPE = sprite(TELESCOPE_GRID, {"B": BLUE, "W": SLATE, "D": GOLD, "C": CYAN}, 3)
 
-# Lunar Rover (10x8)
-ROVER_GRID = [
-    "....R.....",
-    "....|.....",
-    "..WWWWW...",
-    ".WWBCCBW..",
-    ".WWWWWWW..",
-    "..O...O...",
-    ".OOO.OOO..",
-    "..O...O...",
-]
-ROVER = sprite(ROVER_GRID, {"W": SLATE, "B": BLUE, "C": CYAN, "R": ORANGE, "|": DARK_SLATE, "O": NAVY}, 4)
-
-# Golden Star (Big - 9x8)
-STAR_BIG_GRID = [
+# Radiant Primary Star (9x9)
+BEACON_STAR_GRID = [
     "....X....",
     "...XXX...",
     "..XXLXX..",
     "XXXXXXXXX",
-    ".XXXXXXX.",
-    "..XXXXX..",
-    ".XXX.XXX.",
-    ".XX...XX.",
+    ".XXXLXXX.",
+    "XXXXXXXXX",
+    "..XXLXX..",
+    "...XXX...",
+    "....X....",
 ]
-STAR_BIG = sprite(STAR_BIG_GRID, {"X": GOLD, "L": GOLD_L}, 5)
+BEACON_STAR = sprite(BEACON_STAR_GRID, {"X": GOLD, "L": "#FFFDF0"}, 4)
+BEACON_STAR_S = sprite(BEACON_STAR_GRID, {"X": GOLD, "L": "#FFFDF0"}, 2)
 
-# Golden Star Mini (5x5)
-STAR_MINI_GRID = [
+# Mini 4-Point Star (5x5)
+STAR_4PT_GRID = [
     "..X..",
     ".XLX.",
     "XXXXX",
-    ".XXX.",
-    ".X.X.",
+    ".XLX.",
+    "..X..",
 ]
-STAR_MINI = sprite(STAR_MINI_GRID, {"X": GOLD, "L": GOLD_L}, 4)
-STAR_TINY = sprite(STAR_MINI_GRID, {"X": GOLD, "L": GOLD_L}, 3)
-
-# Expedition Flag (8x5)
-FLAG_GRID = [
-    "BBBBBBBB",
-    "BWWWWWWB",
-    "BWWGWWWB",
-    "BWWWWWWB",
-    "BBBBBBBB",
-]
-FLAG = sprite(FLAG_GRID, {"B": BLUE, "W": WHITE, "G": GOLD}, 4)
-
-# Space Probe / Beacon (7x6)
-PROBE_GRID = [
-    "...W...",
-    "..WWW..",
-    ".WWBWW.",
-    "WWRTRWW",
-    ".FLGLF.",
-    "..F.F..",
-]
-PROBE = sprite(PROBE_GRID, {"W": WHITE, "B": BLUE, "R": ORANGE, "T": CYAN, "F": GOLD, "G": GOLD_L}, 4)
-
-
-def moon_hills(x0, steps, w0, step_w, step_h, ground, fill):
-    return "".join(
-        f'<rect x="{x0+i*step_w}" y="{ground-(i+1)*step_h}" width="{w0-i*2*step_w}" height="{step_h}" fill="{fill}"/>'
-        for i in range(steps)
-    )
-
-
-def moon_tiles(W, ground, rows=2):
-    out = []
-    for r in range(rows):
-        for c in range(W // 24 + 1):
-            out.append(f'<rect x="{c*24}" y="{ground+8+r*24}" width="24" height="24" fill="{DEEP}" stroke="{NAVY}" stroke-width="2"/>')
-    craters = [
-        f'<rect x="70" y="{ground+12}" width="28" height="8" fill="{NAVY}"/>',
-        f'<rect x="74" y="{ground+10}" width="20" height="2" fill="{BLUE}"/>',
-        f'<rect x="280" y="{ground+14}" width="36" height="10" fill="{NAVY}"/>',
-        f'<rect x="286" y="{ground+12}" width="24" height="2" fill="{BLUE}"/>',
-        f'<rect x="620" y="{ground+13}" width="32" height="9" fill="{NAVY}"/>',
-        f'<rect x="624" y="{ground+11}" width="24" height="2" fill="{BLUE}"/>',
-    ]
-    return (
-        "".join(out)
-        + "".join(craters)
-        + f'<rect x="0" y="{ground}" width="{W}" height="8" fill="{BLUE}"/>'
-        + f'<rect x="0" y="{ground}" width="{W}" height="3" fill="{SKY3}"/>'
-    )
+STAR_MINI = sprite(STAR_4PT_GRID, {"X": GOLD, "L": GOLD_L}, 3)
 
 
 # ───────────────────────── data ─────────────────────────
@@ -250,7 +189,7 @@ def streaks(days):
         best = max(best, run)
     tail = flags[:]
     if tail and not tail[-1]:
-        tail = tail[:-1]  # hari ini belum ada kontribusi tidak memutus streak
+        tail = tail[:-1]
     cur = 0
     for f in reversed(tail):
         if not f:
@@ -269,11 +208,11 @@ def get_profile():
     now = datetime.now(timezone.utc)
     for r in own:
         if r["name"].lower() == USER.lower():
-            continue  # repo profil sendiri
+            continue
         pushed = datetime.fromisoformat(r["pushed_at"].replace("Z", "+00:00"))
         if (now - pushed).days <= QUEST_MAX_AGE_DAYS:
             quest = r["name"]
-        break  # repo non-profil paling baru; kalau sudah lama -> fallback
+        break
 
     langs = {}
     for r in [x for x in own if x["name"].lower() != USER.lower()][:25]:
@@ -299,161 +238,204 @@ def clean_quest(name):
 
 # ───────────────────────── banner ─────────────────────────
 def make_banner(score, coins, quest):
-    W, H, G = 900, 240, 196
-    stars = []
-    star_positions = [
-        (30, 48), (85, 90), (140, 40), (220, 75), (280, 50),
-        (350, 85), (410, 45), (480, 68), (520, 38), (620, 60),
-        (680, 42), (720, 80), (810, 52), (870, 70), (190, 110),
-        (380, 115), (750, 110), (840, 120), (50, 140), (460, 130)
-    ]
-    for i, (sx, sy) in enumerate(star_positions):
-        delay = (i * 0.35) % 2.5
-        stars.append(f'<rect class="star-twinkle" style="animation-delay:{delay:.1f}s" x="{sx}" y="{sy}" width="3" height="3" fill="{GOLD_L}"/>')
+    W, H = 900, 240
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Pixel art astronaut banner: Andika Dwi Putra">
+    # Bintang-bintang kosmik latar belakang
+    stars = []
+    positions = [
+        (35, 52, 2), (80, 85, 3), (130, 42, 2), (180, 75, 2), (230, 110, 3),
+        (280, 55, 2), (320, 80, 1), (370, 45, 2), (430, 68, 3), (490, 48, 2),
+        (540, 78, 1), (610, 52, 2), (670, 88, 3), (720, 40, 2), (780, 65, 1),
+        (830, 50, 3), (870, 80, 2), (60, 145, 1), (110, 180, 2), (160, 215, 3),
+        (220, 170, 1), (270, 195, 2), (340, 160, 3), (400, 185, 1), (460, 210, 2),
+        (520, 175, 1), (580, 190, 2), (640, 160, 3), (700, 185, 1), (760, 210, 2),
+        (820, 170, 3), (865, 200, 1),
+    ]
+    for i, (sx, sy, sz) in enumerate(positions):
+        delay = (i * 0.28) % 2.5
+        col = GOLD_L if i % 4 == 0 else (SKY3 if i % 3 == 0 else WHITE)
+        stars.append(f'<rect class="twinkle" style="animation-delay:{delay:.2f}s" x="{sx}" y="{sy}" width="{sz}" height="{sz}" fill="{col}"/>')
+
+    # Garis-garis rasi bintang dekoratif di latar
+    constellations = [
+        '<path d="M80 85L130 42L180 75L230 110" stroke="#005A9C" stroke-width="1" stroke-dasharray="2 3" opacity="0.4"/>',
+        '<path d="M670 88L720 40L780 65" stroke="#005A9C" stroke-width="1" stroke-dasharray="2 3" opacity="0.4"/>',
+        '<path d="M220 170L270 195L340 160L400 185" stroke="#1B365D" stroke-width="1" stroke-dasharray="2 3" opacity="0.45"/>',
+        '<path d="M640 160L700 185L760 210L820 170" stroke="#1B365D" stroke-width="1" stroke-dasharray="2 3" opacity="0.45"/>',
+    ]
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Stellar Explorer Banner: Andika Dwi Putra">
 <defs>
-  <linearGradient id="space" x1="0" y1="0" x2="0" y2="1">
+  <linearGradient id="cosmos" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0%" stop-color="{DEEP}"/>
-    <stop offset="55%" stop-color="{NAVY}"/>
+    <stop offset="45%" stop-color="{NAVY}"/>
+    <stop offset="85%" stop-color="{DEEP}"/>
     <stop offset="100%" stop-color="{BLUE}"/>
   </linearGradient>
+  <radialGradient id="nebula" cx="70%" cy="30%" r="55%">
+    <stop offset="0%" stop-color="{BLUE}" stop-opacity="0.35"/>
+    <stop offset="60%" stop-color="{NAVY}" stop-opacity="0.15"/>
+    <stop offset="100%" stop-color="{DEEP}" stop-opacity="0"/>
+  </radialGradient>
 </defs>
 <style>
   {FONT}
-  .hero  {{ animation: zero_g_jump 3.2s ease-in-out infinite; }}
-  .block {{ animation: bump 3.2s ease-in-out infinite; }}
-  .gem   {{ animation: star_pop 3.2s ease-out infinite; opacity: 0; }}
-  .rover {{ animation: walk 8s linear infinite alternate; }}
-  .sat1  {{ animation: orbit 14s linear infinite; }}
-  .star-bob {{ animation: bob 1.8s ease-in-out infinite alternate; }}
-  .star-twinkle {{ animation: twinkle 2s ease-in-out infinite alternate; }}
+  .spacewalk {{ animation: float_zero_g 6s ease-in-out infinite; }}
+  .satellite {{ animation: orbit_drift 16s ease-in-out infinite alternate; }}
+  .star-beacon {{ animation: pulse_star 2.8s ease-in-out infinite alternate; }}
+  .twinkle {{ animation: twinkle 2.2s ease-in-out infinite alternate; }}
+  .meteor {{ animation: shooting_star 7s ease-in infinite; }}
+  .scanner-glow {{ animation: pulse_scan 2s ease-in-out infinite alternate; }}
   .blink {{ animation: blink 1.1s steps(1) infinite; }}
-  @keyframes zero_g_jump {{
-    0%,15% {{ transform: translateY(0); }}
-    32% {{ transform: translateY(-38px) rotate(-3deg); }}
-    48% {{ transform: translateY(-32px) rotate(2deg); }}
-    68%,100% {{ transform: translateY(0) rotate(0deg); }}
+  @keyframes float_zero_g {{
+    0% {{ transform: translate(0, 0) rotate(0deg); }}
+    35% {{ transform: translate(6px, -18px) rotate(-4deg); }}
+    70% {{ transform: translate(-4px, -8px) rotate(2deg); }}
+    100% {{ transform: translate(0, 0) rotate(0deg); }}
   }}
-  @keyframes bump {{
-    0%,29% {{ transform: translateY(0); }}
-    33% {{ transform: translateY(-8px); }}
-    40%,100% {{ transform: translateY(0); }}
+  @keyframes orbit_drift {{
+    from {{ transform: translateX(0); }}
+    to {{ transform: translateX(50px); }}
   }}
-  @keyframes star_pop {{
-    0%,30% {{ opacity: 0; transform: translateY(0) scale(0.6); }}
-    33% {{ opacity: 1; transform: translateY(0) scale(1); }}
-    60% {{ opacity: 1; transform: translateY(-44px) scale(1.1); }}
-    70%,100% {{ opacity: 0; transform: translateY(-54px) scale(0.8); }}
+  @keyframes pulse_star {{
+    0% {{ transform: scale(1); opacity: 0.85; }}
+    100% {{ transform: scale(1.18); opacity: 1; }}
   }}
-  @keyframes walk {{ from {{ transform: translateX(0); }} to {{ transform: translateX(150px); }} }}
-  @keyframes orbit {{ from {{ transform: translateX(0); }} to {{ transform: translateX(45px); }} }}
-  @keyframes bob  {{ from {{ transform: translateY(0); }} to {{ transform: translateY(-6px); }} }}
-  @keyframes twinkle {{ 0%,20% {{ opacity: 0.2; }} 50% {{ opacity: 1; }} 80%,100% {{ opacity: 0.9; }} }}
+  @keyframes pulse_scan {{
+    0% {{ opacity: 0.3; }}
+    100% {{ opacity: 0.8; }}
+  }}
+  @keyframes twinkle {{
+    0%,20% {{ opacity: 0.2; }}
+    50% {{ opacity: 1; }}
+    80%,100% {{ opacity: 0.35; }}
+  }}
+  @keyframes shooting_star {{
+    0%,60% {{ transform: translate(0, 0); opacity: 0; }}
+    62% {{ opacity: 1; }}
+    75% {{ transform: translate(-220px, 120px); opacity: 0; }}
+    100% {{ opacity: 0; }}
+  }}
   @keyframes blink {{ 0%,50% {{ opacity: 1; }} 50.01%,100% {{ opacity: 0; }} }}
 </style>
-<rect width="{W}" height="{H}" fill="url(#space)"/>
+
+<!-- Deep Cosmos Background -->
+<rect width="{W}" height="{H}" fill="url(#cosmos)"/>
+<rect width="{W}" height="{H}" fill="url(#nebula)"/>
+
+<!-- Constellation Grid Lines & Twinkling Stars -->
+{"".join(constellations)}
 {"".join(stars)}
 
-<!-- Distant Planet Earth -->
-<g opacity="0.85" transform="translate(730,42)"><g>{PLANET}</g></g>
-
-<!-- Orbiting Satellite -->
-<g class="sat1" opacity="0.65" transform="translate(260,40)"><g>{SATELLITE}</g></g>
-
-<!-- Lunar Horizons -->
-{moon_hills(480, 5, 290, 22, 14, G, NAVY)}
-{moon_hills(40, 4, 210, 20, 14, G, NAVY)}
-
-<!-- Top Astronaut HUD Bar -->
-<rect width="{W}" height="34" fill="{DEEP}" opacity="0.75"/>
-<text x="20" y="22" font-size="13" fill="#FFFFFF" letter-spacing="2">AKID [ASTRONAUT]</text>
-<text x="220" y="22" font-size="13" fill="{GOLD}" letter-spacing="2">STARS FOUND: {score:06d}</text>
-<text x="500" y="22" font-size="13" fill="{SKY3}" letter-spacing="2">SECTORS: x{coins:02d}</text>
-<text x="880" y="22" text-anchor="end" font-size="13" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
-
-<!-- Title & Subtitle -->
-<text x="563" y="103" text-anchor="middle" font-size="36" fill="{DEEP}" letter-spacing="3">ANDIKA DWI PUTRA</text>
-<text x="560" y="100" text-anchor="middle" font-size="36" fill="#FFFFFF" letter-spacing="3">ANDIKA DWI PUTRA</text>
-<text x="560" y="132" text-anchor="middle" font-size="15" fill="{SKY3}" letter-spacing="4">SPACE EXPLORER • CS STUDENT</text>
-<text class="blink" x="560" y="166" text-anchor="middle" font-size="14" fill="{GOLD}" letter-spacing="3">&gt; INITIATE MISSION</text>
-
-<!-- Cosmic Beacon / Discovery Pod -->
-<rect x="110" y="52" width="48" height="48" fill="{NAVY}" stroke="{SKY3}" stroke-width="3"/>
-<rect x="206" y="52" width="48" height="48" fill="{NAVY}" stroke="{SKY3}" stroke-width="3"/>
-<path d="M110 76H158M134 52V76M206 76H254M230 52V76M110 100V76" stroke="{SKY3}" stroke-width="2" opacity="0.5" fill="none"/>
-<g class="block">
-  <rect x="158" y="52" width="48" height="48" fill="{BLUE}" stroke="{SKY3}" stroke-width="3"/>
-  <text x="182" y="84" text-anchor="middle" font-size="22" fill="#FFFFFF">{{}}</text>
+<!-- Shooting Star / Meteor -->
+<g class="meteor" transform="translate(860, 20)">
+  <line x1="0" y1="0" x2="30" y2="-16" stroke="{GOLD_L}" stroke-width="2" opacity="0.8"/>
+  <rect x="0" y="0" width="3" height="3" fill="#FFFFFF"/>
 </g>
-<g class="gem"><g transform="translate(160,20)">{STAR_BIG}</g></g>
 
-<!-- Pixel Astronaut Hero -->
-<g class="hero"><g transform="translate(145,{G-75})">{HERO}</g></g>
+<!-- Distant Ringed Exoplanet -->
+<g opacity="0.75" transform="translate(730, 45)"><g>{PLANET_RINGED}</g></g>
 
-<!-- Lunar Rover Patrolling -->
-<g class="rover"><g transform="translate(590,{G-32})">{ROVER}</g></g>
+<!-- Deep Space Observatory Satellite -->
+<g class="satellite" opacity="0.65" transform="translate(480, 42)"><g>{TELESCOPE}</g></g>
 
-<!-- Floating Collectible Stars -->
-<g class="star-bob"><g transform="translate(300,146)">{STAR_MINI}</g></g>
-<g class="star-bob" style="animation-delay:.3s"><g transform="translate(335,138)">{STAR_MINI}</g></g>
-<g class="star-bob" style="animation-delay:.6s"><g transform="translate(370,146)">{STAR_MINI}</g></g>
+<!-- Top Sci-Fi Navigation HUD -->
+<rect width="{W}" height="34" fill="{DEEP}" opacity="0.8"/>
+<rect x="0" y="33" width="{W}" height="1" fill="{BLUE}"/>
+<text x="24" y="22" font-size="13" fill="#FFFFFF" letter-spacing="2">[PILOT: AKID]</text>
+<text x="220" y="22" font-size="13" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {score:06d}</text>
+<text x="560" y="22" font-size="13" fill="{SKY3}" letter-spacing="2">SYSTEMS: x{coins:02d}</text>
+<text x="876" y="22" text-anchor="end" font-size="13" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
 
-<!-- Lunar Mission Flag -->
-<rect x="856" y="96" width="4" height="100" fill="{SLATE}"/>
-<rect x="853" y="88" width="10" height="10" fill="{GOLD}"/>
-<g transform="translate(824,102)">{FLAG}</g>
-<rect x="846" y="184" width="24" height="12" fill="{NAVY}" stroke="{SKY3}" stroke-width="2"/>
+<!-- Primary Radiant Beacon Star -->
+<g transform="translate(245, 120)">
+  <circle cx="18" cy="18" r="28" fill="{BLUE}" opacity="0.25" class="scanner-glow"/>
+  <g class="star-beacon" style="transform-origin: 18px 18px;">{BEACON_STAR}</g>
+  <path d="M-60 18L0 18" stroke="{CYAN}" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+</g>
 
-<!-- Lunar Ground -->
-{moon_tiles(W, G)}
+<!-- Spacewalking Astronaut in Zero-G -->
+<g class="spacewalk" style="transform-origin: 130px 145px;" transform="translate(100, 115)">
+  <!-- Tether Cable connecting to spacecraft -->
+  <path d="M-90 40 C -50 20, -20 60, 4 35" fill="none" stroke="{SKY1}" stroke-width="2" opacity="0.45"/>
+  <rect x="-95" y="38" width="6" height="6" fill="{BLUE}"/>
+  <g>{HERO_FLOAT}</g>
+  <!-- Scanner beam projection -->
+  <polygon points="68,36 145,20 145,52" fill="{CYAN}" opacity="0.12" class="scanner-glow"/>
+  <line x1="68" y1="36" x2="145" y2="36" stroke="{CYAN}" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>
+</g>
+
+<!-- Center Typography & Status -->
+<text x="583" y="103" text-anchor="middle" font-size="34" fill="{DEEP}" letter-spacing="3">ANDIKA DWI PUTRA</text>
+<text x="580" y="100" text-anchor="middle" font-size="34" fill="#FFFFFF" letter-spacing="3">ANDIKA DWI PUTRA</text>
+<text x="580" y="132" text-anchor="middle" font-size="14" fill="{SKY3}" letter-spacing="4">STELLAR EXPLORER • COMPUTER SCIENCE</text>
+<text class="blink" x="580" y="166" text-anchor="middle" font-size="13" fill="{GOLD}" letter-spacing="3">&gt; CHARTING THE DIGITAL UNIVERSE_</text>
+
+<!-- Tech Telemetry Grid Bottom Border -->
+<rect x="0" y="{H-10}" width="{W}" height="10" fill="{DEEP}"/>
+<rect x="0" y="{H-10}" width="{W}" height="2" fill="{NAVY}"/>
+<rect x="40" y="{H-6}" width="4" height="4" fill="{BLUE}"/>
+<rect x="60" y="{H-6}" width="20" height="2" fill="{NAVY}"/>
+<rect x="90" y="{H-6}" width="4" height="4" fill="{SKY3}"/>
+<rect x="110" y="{H-6}" width="40" height="2" fill="{NAVY}"/>
+<rect x="{W-150}" y="{H-6}" width="40" height="2" fill="{NAVY}"/>
+<rect x="{W-100}" y="{H-6}" width="4" height="4" fill="{GOLD}"/>
+<rect x="{W-80}" y="{H-6}" width="20" height="2" fill="{NAVY}"/>
+<rect x="{W-50}" y="{H-6}" width="4" height="4" fill="{BLUE}"/>
 </svg>
 '''
 
 
 # ───────────────────────── stats ─────────────────────────
-def card(x, y, w, h, title, icon=""):
+def sci_fi_card(x, y, w, h, title, icon=""):
     return (
-        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{NAVY}"/>'
-        f'<rect x="{x+2}" y="{y+2}" width="{w-4}" height="{h-4}" fill="none" stroke="{BLUE}" stroke-width="4"/>'
-        f'<rect x="{x+8}" y="{y+8}" width="{w-16}" height="{h-16}" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.35"/>'
-        f'<g transform="translate({x+20},{y+20})">{icon}</g>'
-        f'<text x="{x+54}" y="{y+38}" font-size="16" fill="#FFFFFF" letter-spacing="3">{title}</text>'
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{DEEP}" opacity="0.9"/>'
+        f'<rect x="{x+2}" y="{y+2}" width="{w-4}" height="{h-4}" fill="none" stroke="{NAVY}" stroke-width="3"/>'
+        f'<rect x="{x+6}" y="{y+6}" width="{w-12}" height="{h-12}" fill="none" stroke="{BLUE}" stroke-width="1" opacity="0.6"/>'
+        # Corner brackets
+        f'<path d="M{x+2} {y+16}V{y+2}H{x+16}" fill="none" stroke="{SKY3}" stroke-width="2"/>'
+        f'<path d="M{x+w-16} {y+2}H{x+w-2}V{y+16}" fill="none" stroke="{SKY3}" stroke-width="2"/>'
+        f'<path d="M{x+2} {y+h-16}V{y+h-2}H{x+16}" fill="none" stroke="{SKY3}" stroke-width="2"/>'
+        f'<path d="M{x+w-16} {y+h-2}H{x+w-2}V{y+h-16}" fill="none" stroke="{SKY3}" stroke-width="2"/>'
+        # Title bar
+        f'<g transform="translate({x+20},{y+18})">{icon}</g>'
+        f'<text x="{x+54}" y="{y+36}" font-size="15" fill="#FFFFFF" letter-spacing="3">{title}</text>'
+        f'<line x1="{x+18}" y1="{y+48}" x2="{x+w-18}" y2="{y+48}" stroke="{BLUE}" stroke-width="2" opacity="0.5"/>'
     )
 
 
 def make_stats(total, cur, best, prof):
     W, H = 900, 240
     rows = [
-        ("STARS DISCOVERED (1Y)", f"{total}"),
-        ("DISCOVERED REPOS", f"{prof['repos']}"),
-        ("STARGAZERS", f"{prof['stars']}"),
-        ("SPACE CREW", f"{prof['followers']}"),
-        ("EXPEDITION STREAK", f"{cur}/{best} DAYS"),
+        ("STARS DISCOVERED (1Y)", f"{total} ★"),
+        ("CHARTED REPOSITORIES", f"{prof['repos']}"),
+        ("STELLAR BEACONS (STARS)", f"{prof['stars']}"),
+        ("EXPEDITION CREW", f"{prof['followers']}"),
+        ("VOYAGE STREAK", f"{cur}/{best} DAYS"),
     ]
-    left = card(10, 10, 430, 220, "ASTRONAUT LOG", STAR_MINI)
+    left = sci_fi_card(10, 10, 430, 220, "STELLAR LOGBOOK", STAR_MINI)
     for i, (k, v) in enumerate(rows):
-        y = 84 + i * 28
-        left += f'<text x="34" y="{y}" font-size="14" fill="{SKY3}" letter-spacing="1">{k}</text>'
-        left += f'<text x="416" y="{y}" text-anchor="end" font-size="15" fill="#FFFFFF">{v}</text>'
-        left += f'<path d="M34 {y+8}H416" stroke="{BLUE}" stroke-width="2" stroke-dasharray="4 4"/>'
+        y = 86 + i * 28
+        left += f'<text x="32" y="{y}" font-size="13" fill="{SKY3}" letter-spacing="1">{k}</text>'
+        left += f'<text x="414" y="{y}" text-anchor="end" font-size="14" fill="{GOLD if i==0 else "#FFFFFF"}">{v}</text>'
+        left += f'<path d="M32 {y+8}H414" stroke="{NAVY}" stroke-width="1" stroke-dasharray="4 4"/>'
 
-    right = card(460, 10, 430, 220, "SYSTEM TELEMETRY", SATELLITE)
+    right = sci_fi_card(460, 10, 430, 220, "MISSION TELEMETRY", TELESCOPE)
     langs = sorted(prof["langs"].items(), key=lambda kv: -kv[1])[:5]
     total_b = sum(prof["langs"].values()) or 1
     if not langs:
-        right += f'<text x="484" y="110" font-size="14" fill="{SKY3}">NO DATA YET</text>'
+        right += f'<text x="484" y="110" font-size="13" fill="{SKY3}">NO DATA YET</text>'
     for i, (name, b) in enumerate(langs):
-        y = 84 + i * 28
+        y = 86 + i * 28
         pct = b * 100 / total_b
         filled = max(1, round(pct / 100 * 12))
-        right += f'<text x="484" y="{y}" font-size="14" fill="#FFFFFF">{esc(name[:11].upper())}</text>'
+        right += f'<text x="484" y="{y}" font-size="13" fill="#FFFFFF">{esc(name[:11].upper())}</text>'
         for s in range(12):
-            color = SKY2 if s < filled else DEEP
+            color = SKY2 if s < filled else SPACE_DARK
             right += f'<rect x="{600+s*16}" y="{y-12}" width="13" height="14" fill="{color}" stroke="{BLUE}" stroke-width="1"/>'
-        right += f'<text x="870" y="{y}" text-anchor="end" font-size="14" fill="{SKY3}">{pct:.0f}%</text>'
+        right += f'<text x="870" y="{y}" text-anchor="end" font-size="13" fill="{SKY3}">{pct:.0f}%</text>'
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Astronaut log and system telemetry">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Stellar logbook and mission telemetry">
 <style>{FONT}</style>
 {left}
 {right}
@@ -461,10 +443,7 @@ def make_stats(total, cur, best, prof):
 '''
 
 
-# ───────────────────────── contribution game ─────────────────────────
-LEVEL_FILL = {1: BLUE, 2: SKY1, 3: SKY2, 4: SKY3}
-
-
+# ───────────────────────── celestial cartography ─────────────────────────
 def grade_for(total):
     for limit, g in ((1000, "S"), (600, "A"), (300, "B"), (100, "C")):
         if total >= limit:
@@ -473,241 +452,192 @@ def grade_for(total):
 
 
 def make_game(days, total, best):
-    """Satu putaran: astronot meluncurkan probe -> konstelasi bintang meledak berantai -> layar hasil ekspedisi."""
-    W, H, G, T = 900, 300, 262, 22
+    """Peta konstelasi bintang nyata dari kontribusi GitHub dengan astronot melakukan pemetaan radar kosmik."""
+    W, H = 900, 300
+    T = 20  # Durasi siklus animasi dalam detik
+
+    gx, gy = 145, 68
+    pitch_x, pitch_y = 13.8, 17.0
     cols = max(d[2] for d in days) + 1
-    pitch, size, gx = 15, 13, 24
-    by_col = {c: sorted([l for (_, _, cc, l) in days if cc == c and l > 0], reverse=True) for c in range(cols)}
-    n = [len(by_col[c]) for c in range(cols)]
-    top = lambda c: G - n[c] * pitch
-    active = [c for c in range(cols) if n[c] > 0]
-    nblocks = sum(n)
+    nblocks = sum(1 for d in days if d[3] > 0)
 
-    # titik tumbukan = kolom aktif terdekat dengan pusat massa
-    if active:
-        wsum = sum(n[c] for c in active)
-        mid = sum((gx + c * pitch + size / 2) * n[c] for c in active) / wsum
-        ic = min(active, key=lambda c: abs(gx + c * pitch + size / 2 - mid))
-        ix, iy = gx + ic * pitch + size / 2, top(ic) + 10
-    else:
-        ix, iy = W / 2, G - 10
+    # Membangun simpul-simpul bintang dari data kontribusi nyata
+    star_nodes = []
+    active_points = []
+    for d, r, c, lvl in days:
+        sx = gx + c * pitch_x
+        sy = gy + r * pitch_y
+        if lvl == 0:
+            star_nodes.append(f'<rect x="{sx+4:.1f}" y="{sy+4:.1f}" width="2" height="2" fill="{NAVY}" opacity="0.35"/>')
+        elif lvl == 1:
+            active_points.append((sx + 5, sy + 5, lvl))
+            star_nodes.append(f'<rect x="{sx+3:.1f}" y="{sy+3:.1f}" width="4" height="4" fill="{BLUE}"/>')
+        elif lvl == 2:
+            active_points.append((sx + 5, sy + 5, lvl))
+            star_nodes.append(f'<polygon points="{sx+5:.1f},{sy+1:.1f} {sx+8:.1f},{sy+5:.1f} {sx+5:.1f},{sy+9:.1f} {sx+2:.1f},{sy+5:.1f}" fill="{SKY1}"/>')
+        elif lvl == 3:
+            active_points.append((sx + 5, sy + 5, lvl))
+            star_nodes.append(
+                f'<rect x="{sx+2:.1f}" y="{sy+2:.1f}" width="6" height="6" fill="{SKY2}"/>'
+                f'<rect x="{sx+4:.1f}" y="{sy+4:.1f}" width="2" height="2" fill="#FFFFFF"/>'
+            )
+        elif lvl == 4:
+            active_points.append((sx + 5, sy + 5, lvl))
+            star_nodes.append(
+                f'<polygon points="{sx+5:.1f},{sy:.1f} {sx+9:.1f},{sy+5:.1f} {sx+5:.1f},{sy+10:.1f} {sx+1:.1f},{sy+5:.1f}" fill="{GOLD}"/>'
+                f'<rect x="{sx+3:.1f}" y="{sy+3:.1f}" width="4" height="4" fill="#FFFFFF"/>'
+            )
 
-    seed = [20261101]
+    # Garis-garis konstelasi halus menghubungkan gugusan bintang terdekat
+    constellation_lines = []
+    for i in range(len(active_points) - 1):
+        x1, y1, l1 = active_points[i]
+        x2, y2, l2 = active_points[i + 1]
+        dist = math.hypot(x2 - x1, y2 - y1)
+        if dist < 32 and (l1 >= 2 or l2 >= 2):
+            constellation_lines.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{SKY3}" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"/>')
 
-    def rnd():
-        seed[0] = (seed[0] * 1103515245 + 12345) & 0x7FFFFFFF
-        return seed[0] / 0x7FFFFFFF
-
-    # ── timeline (persen dari T) ──
-    T_THROW, T_HIT = 8.0, 18.0
-    NB = 10                       # jumlah "gelombang" supernova
-    WAVE0, WAVE_STEP = T_HIT, 0.8
+    # Status & Overlay Timeline
+    css = [
+        "@keyframes scan_sweep {"
+        "  0% { transform: translateX(0); opacity: 0; }"
+        "  5% { opacity: 0.9; }"
+        "  40% { transform: translateX(740px); opacity: 0.9; }"
+        "  45%,100% { transform: translateX(740px); opacity: 0; }"
+        "}",
+        "@keyframes hud_fade {"
+        "  0%,44% { opacity: 0; transform: translateY(8px); }"
+        "  48%,94% { opacity: 1; transform: translateY(0); }"
+        "  98%,100% { opacity: 0; transform: translateY(-8px); }"
+        "}",
+        "@keyframes float_astro {"
+        "  0%,100% { transform: translateY(0) rotate(0deg); }"
+        "  50% { transform: translateY(-12px) rotate(-3deg); }"
+        "}",
+        "@keyframes starlight_pulse {"
+        "  0%,100% { opacity: 0.4; }"
+        "  50% { opacity: 0.9; }"
+        "}",
+    ]
 
     def kf(name, body):
-        return "@keyframes %s{%s}" % (name, body)
+        return f"@keyframes {name}{{{body}}}"
 
-    css = []
-    for k in range(NB):
-        e = WAVE0 + k * WAVE_STEP
-        css.append(kf(f"bm{k}",
-            f"0%,{e:.1f}%{{transform:translate(0,0) rotate(0deg);opacity:1}}"
-            f"{e+2.5:.1f}%{{transform:translate(var(--hx),var(--hy)) rotate(var(--hr));opacity:1}}"
-            f"{e+8:.1f}%,97%{{transform:translate(var(--dx),var(--dy)) rotate(var(--dr));opacity:0}}"
-            f"100%{{transform:translate(0,0) rotate(0deg);opacity:1}}"))
+    def win(name, a, b):
+        css.append(kf(name, f"0%,{a}%{{opacity:0}}{a+0.5}%,{b}%{{opacity:1}}{b+0.5}%,100%{{opacity:0}}"))
 
-    dmax = 1.0
-    cells = []
-    for c in active:
-        for i, lvl in enumerate(by_col[c]):
-            bx, by = gx + c * pitch, top(c) + i * pitch
-            cells.append((c, i, lvl, bx, by, math.hypot(bx + size / 2 - ix, by + size / 2 - iy)))
-    if cells:
-        dmax = max(max(x[5] for x in cells), 1.0)
+    win("phase1", 0, 16)
+    win("phase2", 17, 38)
+    win("phase3", 39, 44)
 
-    blocks, stars_top = [], []
-    for c, i, lvl, bx, by, dist in cells:
-        k = min(NB - 1, int(dist / dmax * NB))
-        ux, uy = (bx + size / 2 - ix) / max(dist, 1), (by + size / 2 - iy) / max(dist, 1)
-        sp = 40 + rnd() * 90
-        v = (f"--hx:{ux*sp*0.5:.0f}px;--hy:{uy*sp*0.5-30:.0f}px;--dx:{ux*sp*1.1+(rnd()-.5)*20:.0f}px;"
-             f"--dy:{G-by+40+rnd()*30:.0f}px;--hr:{(rnd()-.5)*240:.0f}deg;--dr:{(rnd()-.5)*720:.0f}deg")
-        blocks.append(
-            f'<g class="b" style="{v};animation:bm{k} {T}s linear infinite">'
-            f'<rect x="{bx}" y="{by}" width="{size}" height="{size}" fill="{LEVEL_FILL[lvl]}"/>'
-            f'<rect x="{bx+2}" y="{by+2}" width="3" height="3" fill="#FFFFFF" opacity="0.6"/>'
-            + (f'<rect x="{bx}" y="{by}" width="{size}" height="2" fill="{GOLD_L}" opacity="0.85"/>' if i == 0 else "")
-            + "</g>")
-    for c in active:
-        cx = gx + c * pitch + size / 2
-        d = math.hypot(cx - ix, top(c) - 20 - iy)
-        k = min(NB - 1, int(d / dmax * NB))
-        ux = (cx - ix) / max(d, 1)
-        v = f"--hx:{ux*10:.0f}px;--hy:-26px;--dx:{ux*24:.0f}px;--dy:-72px;--hr:0deg;--dr:0deg"
-        stars_top.append(
-            f'<g class="b" style="{v};animation:bm{k} {T}s linear infinite">'
-            f'<g transform="translate({cx-7:.1f},{top(c)-24})">{STAR_TINY}</g></g>')
-
-    # ── peluncuran probe (parabola kosmik) ──
-    xs, ys, xe, ye = 60 + 36, G - 38, ix, iy - 6
-    arc = 130
-    fly = [f"0%,{T_THROW-0.1:.1f}%{{opacity:0;transform:translate({xs}px,{ys}px)}}"]
-    for j in range(15):
-        t = j / 14
-        x = xs + (xe - xs) * t
-        y = ys + (ye - ys) * t - 4 * arc * t * (1 - t)
-        fly.append(f"{T_THROW + (T_HIT - T_THROW) * t:.2f}%{{opacity:1;transform:translate({x:.1f}px,{y:.1f}px)}}")
-    fly.append(f"{T_HIT+0.05:.2f}%,100%{{opacity:0;transform:translate({xe:.1f}px,{ye:.1f}px)}}")
-    css.append(kf("fly", "".join(fly)))
-
-    # ── astronot, supernova flash, status ──
-    css.append(kf("hero",
-        "0%,5%{transform:translate(0,0)}7%{transform:translate(-5px,0)}9%{transform:translate(6px,0)}"
-        "11%,24%{transform:translate(0,0)}26.5%{transform:translate(0,-14px)}29%{transform:translate(0,0)}"
-        "31.5%{transform:translate(0,-14px)}34%,100%{transform:translate(0,0)}"))
-    css.append(kf("spin", "to{transform:rotate(720deg)}"))
-    css.append(kf("shake",
-        f"0%,{T_HIT}%{{transform:translate(0,0)}}{T_HIT+0.4}%{{transform:translate(-4px,3px)}}"
-        f"{T_HIT+0.8}%{{transform:translate(4px,-3px)}}{T_HIT+1.2}%{{transform:translate(-3px,-2px)}}"
-        f"{T_HIT+1.6}%{{transform:translate(3px,2px)}}{T_HIT+2.2}%,100%{{transform:translate(0,0)}}"))
-    css.append(kf("flash", f"0%,{T_HIT}%{{opacity:0;transform:scale(.2)}}{T_HIT+0.3}%{{opacity:1;transform:scale(.7)}}"
-                           f"{T_HIT+2.5}%,100%{{opacity:0;transform:scale(2.4)}}"))
-    css.append(kf("ring1", f"0%,{T_HIT}%{{opacity:0;transform:scale(.2)}}{T_HIT+0.3}%{{opacity:1;transform:scale(.4)}}"
-                           f"{T_HIT+9}%,100%{{opacity:0;transform:scale(5)}}"))
-    css.append(kf("ring2", f"0%,{T_HIT+1}%{{opacity:0;transform:scale(.2)}}{T_HIT+1.4}%{{opacity:1;transform:scale(.4)}}"
-                           f"{T_HIT+11}%,100%{{opacity:0;transform:scale(4)}}"))
-    css.append(kf("spark", f"0%,{T_HIT}%{{opacity:0;transform:translate(0,0)}}{T_HIT+0.2}%{{opacity:1;transform:translate(0,0)}}"
-                           f"{T_HIT+7}%,100%{{opacity:0;transform:translate(var(--sx),var(--sy))}}"))
-
-    def window(name, a, b):
-        css.append(kf(name, f"0%,{a}%{{opacity:0}}{a+0.8}%,{b}%{{opacity:1}}{b+0.8}%,100%{{opacity:0}}"))
-
-    window("s1", 0, 7.5)
-    window("s2", 8, 17.5)
-    window("s3", 18, 36)
-    OV = 38
-    css.append(kf("ov", f"0%,{OV}%{{opacity:0}}{OV+3}%,94%{{opacity:1}}98%,100%{{opacity:0}}"))
-    css.append(kf("fadeA", "0%,41%{opacity:0}42.5%,94%{opacity:1}98%,100%{opacity:0}"))
-    css.append(kf("fadeB", "0%,44%{opacity:0}45.5%,94%{opacity:1}98%,100%{opacity:0}"))
-    css.append(kf("fadeC", "0%,47%{opacity:0}48.5%,94%{opacity:1}98%,100%{opacity:0}"))
-    css.append(kf("fadeD", "0%,50%{opacity:0}51.5%,94%{opacity:1}98%,100%{opacity:0}"))
-    css.append(kf("pop", "0%,73%{opacity:0;transform:scale(2.2)}75%{opacity:1;transform:scale(.88)}"
-                         "77%,94%{opacity:1;transform:scale(1)}98%,100%{opacity:0;transform:scale(1)}"))
-
-    # hitung-naik skor (jumlah bintang yang ditemukan)
-    N, S0, S1 = 14, 56.0, 70.0
+    # Roll-up angka bintang
+    N, S0, S1 = 12, 54.0, 68.0
     layers = []
     for k in range(N + 1):
         v = round(total * (1 - (1 - k / N) ** 2))
         a = S0 + k * (S1 - S0) / N
         b = S0 + (k + 1) * (S1 - S0) / N if k < N else 94.0
         end = f"{b:.2f}%,100%{{opacity:0}}" if k < N else "94%{opacity:1}98%,100%{opacity:0}"
-        css.append(kf(f"v{k}", f"0%,{a:.2f}%{{opacity:0}}{a+0.01:.2f}%,{b-0.01:.2f}%{{opacity:1}}" + end))
+        css.append(kf(f"rk{k}", f"0%,{a:.2f}%{{opacity:0}}{a+0.01:.2f}%,{b-0.01:.2f}%{{opacity:1}}" + end))
         layers.append(f'<text x="560" y="219" text-anchor="end" font-size="26" fill="{GOLD}" letter-spacing="2" '
-                      f'style="opacity:0;animation:v{k} {T}s linear infinite">{v:06d}</text>')
-
-    # percikan stardust
-    sparks = []
-    for j in range(12):
-        ang = j / 12 * 2 * math.pi
-        dist = 50 + rnd() * 70
-        sparks.append(f'<rect x="{ix-3:.1f}" y="{iy-3:.1f}" width="6" height="6" fill="{GOLD if j%2 else "#FFFFFF"}" '
-                      f'style="--sx:{math.cos(ang)*dist:.0f}px;--sy:{math.sin(ang)*dist-10:.0f}px;opacity:0;animation:spark {T}s linear infinite"/>')
-
-    # bintang latar belakang
-    stars = []
-    for _ in range(40):
-        sx = int(rnd() * W)
-        sy = 42 + int(rnd() * 110)
-        stars.append(f'<rect x="{sx}" y="{sy}" width="3" height="3" fill="{GOLD_L if rnd() > 0.6 else PALE}" opacity="0.45"/>')
+                      f'style="opacity:0;animation:rk{k} {T}s linear infinite">{v:06d} ★</text>')
 
     grade = grade_for(total)
     gcol = {"S": GOLD, "A": SKY3, "B": SKY2, "C": SKY1, "D": PALE}[grade]
-    A = lambda cls, extra="": f'class="{cls}" style="opacity:0;animation:{cls} {T}s linear infinite{extra}"'
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Contribution constellation as an astronaut mission game: launch a probe, ignite stars, discover your score">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Celestial Cartography: Star discovery constellation map">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="{DEEP}"/>
+  <linearGradient id="chart_bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="{DEEP}"/>
     <stop offset="60%" stop-color="{NAVY}"/>
     <stop offset="100%" stop-color="{DEEP}"/>
+  </linearGradient>
+  <linearGradient id="scan_beam" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="{CYAN}" stop-opacity="0"/>
+    <stop offset="70%" stop-color="{CYAN}" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="{CYAN}" stop-opacity="0.9"/>
   </linearGradient>
 </defs>
 <style>
   {FONT}
-  .b, .spin, .fx, .grade {{ transform-box: fill-box; transform-origin: center; }}
-  .scene {{ animation: shake {T}s linear infinite; }}
-  .hero  {{ animation: hero {T}s linear infinite; }}
-  .stone {{ opacity: 0; animation: fly {T}s linear infinite; }}
-  .spin  {{ animation: spin 0.6s linear infinite; }}
-  .flash {{ opacity: 0; animation: flash {T}s linear infinite; }}
-  .ring1 {{ opacity: 0; animation: ring1 {T}s linear infinite; }}
-  .ring2 {{ opacity: 0; animation: ring2 {T}s linear infinite; }}
-  .cl1 {{ animation: drift 14s ease-in-out infinite alternate; }}
-  .cl2 {{ animation: drift 18s ease-in-out infinite alternate-reverse; }}
-  @keyframes drift {{ from {{ transform: translateX(0); }} to {{ transform: translateX(40px); }} }}
+  .astro-float {{ animation: float_astro 5s ease-in-out infinite; }}
+  .scan-wave  {{ animation: scan_sweep {T}s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }}
+  .hud-result {{ animation: hud_fade {T}s ease-in-out infinite; }}
+  .pulse-starlight {{ animation: starlight_pulse 3s ease-in-out infinite alternate; }}
   {"".join(css)}
 </style>
-<rect width="{W}" height="{H}" fill="url(#bg)"/>
-{"".join(stars)}
 
-<!-- Distant Orbiting Satellite & Planet -->
-<g class="cl1" opacity="0.45" transform="translate(120,48)"><g>{SATELLITE}</g></g>
-<g class="cl2" opacity="0.30" transform="translate(740,46)"><g>{PLANET}</g></g>
+<!-- Deep Space Chart Canvas -->
+<rect width="{W}" height="{H}" fill="url(#chart_bg)"/>
 
-<!-- Lunar Horizons -->
-{moon_hills(40, 4, 220, 20, 12, G, NAVY)}
-{moon_hills(360, 5, 300, 20, 12, G, NAVY)}
+<!-- Grid Coordinate Guides -->
+<path d="M{gx} {gy-12}H880M{gx} {gy+122}H880" stroke="{NAVY}" stroke-width="1" stroke-dasharray="6 6" opacity="0.6"/>
+<text x="{gx}" y="{gy-18}" font-size="10" fill="{SKY1}" letter-spacing="2">SECTOR 01 [52 WEEKS CELESTIAL COORDINATES]</text>
 
-<!-- Top HUD Bar -->
-<rect width="{W}" height="34" fill="{DEEP}" opacity="0.75"/>
-<text x="20" y="22" font-size="13" fill="#FFFFFF" letter-spacing="2">CONSTELLATION QUEST</text>
-<text x="880" y="22" text-anchor="end" font-size="13" fill="{GOLD}" letter-spacing="2">TARGET: {nblocks} STAR CLUSTERS</text>
+<!-- Constellation Links & Star Nodes -->
+<g class="pulse-starlight">{"".join(constellation_lines)}</g>
+{"".join(star_nodes)}
 
-<g class="scene">
-{"".join(blocks)}
-{"".join(stars_top)}
-<g transform="translate(60,{G-45})"><g class="hero">{HERO_S}</g></g>
-<g class="stone"><g class="spin"><g transform="translate(-14,-12)">{PROBE}</g></g></g>
+<!-- Scanner Laser Radar Wave -->
+<g class="scan-wave" transform="translate({gx}, {gy-15})">
+  <rect width="24" height="142" fill="url(#scan_beam)"/>
+  <line x1="24" y1="0" x2="24" y2="142" stroke="{WHITE}" stroke-width="1.5"/>
 </g>
 
-<!-- Supernova Blast Effects -->
-<circle class="flash fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="#FFFFFF"/>
-<circle class="ring1 fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="none" stroke="{SKY3}" stroke-width="5"/>
-<circle class="ring2 fx" cx="{ix:.1f}" cy="{iy:.1f}" r="30" fill="none" stroke="{GOLD}" stroke-width="4"/>
-{"".join(sparks)}
+<!-- Floating Astronaut Mapping Stars on Left -->
+<g class="astro-float" transform="translate(36, 100)">
+  <!-- Navigation Tether -->
+  <path d="M-20 -15 C 5 -30, 15 -10, 24 10" fill="none" stroke="{SKY1}" stroke-width="2" opacity="0.5"/>
+  <rect x="-24" y="-18" width="6" height="6" fill="{BLUE}"/>
+  <g>{HERO_FLOAT_S}</g>
+  <!-- Scanner Sensor Cone -->
+  <polygon points="56,26 100,5 100,48" fill="{CYAN}" opacity="0.12"/>
+  <line x1="56" y1="26" x2="105" y2="26" stroke="{CYAN}" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+</g>
 
-<!-- Lunar Surface Base -->
-{moon_tiles(W, G, rows=1)}
-<text style="opacity:0;animation:s1 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">SCANNING DEEP SPACE...</text>
-<text style="opacity:0;animation:s2 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">LAUNCHING PROBE!</text>
-<text style="opacity:0;animation:s3 {T}s linear infinite" x="20" y="287" font-size="11" fill="{GOLD}" letter-spacing="2">STARBURST DISCOVERED!</text>
+<!-- Top Cartography HUD Bar -->
+<rect width="{W}" height="34" fill="{DEEP}" opacity="0.8"/>
+<line x1="0" y1="33" x2="{W}" y2="33" stroke="{BLUE}" stroke-width="1"/>
+<text x="20" y="22" font-size="13" fill="#FFFFFF" letter-spacing="2">CELESTIAL CARTOGRAPHY</text>
+<text x="880" y="22" text-anchor="end" font-size="13" fill="{GOLD}" letter-spacing="2">CHARTED NODES: {nblocks} STARS</text>
 
-<!-- Result Overlay Screen -->
-<g style="opacity:0;animation:ov {T}s linear infinite">
-  <rect width="{W}" height="{H}" fill="{DEEP}" opacity="0.84"/>
+<!-- Dynamic Status Telemetry (Bottom) -->
+<rect x="0" y="{H-32}" width="{W}" height="32" fill="{DEEP}" opacity="0.85"/>
+<line x1="0" y1="{H-32}" x2="{W}" y2="{H-32}" stroke="{NAVY}" stroke-width="1"/>
+<text style="opacity:0;animation:phase1 {T}s linear infinite" x="24" y="{H-12}" font-size="12" fill="{GOLD}" letter-spacing="2">&gt; SCANNING UNCHARTED STELLAR SECTORS...</text>
+<text style="opacity:0;animation:phase2 {T}s linear infinite" x="24" y="{H-12}" font-size="12" fill="{CYAN}" letter-spacing="2">&gt; MAPPING CONSTELLATION COORDINATES ACROSS 52 CYCLES...</text>
+<text style="opacity:0;animation:phase3 {T}s linear infinite" x="24" y="{H-12}" font-size="12" fill="{SKY3}" letter-spacing="2">&gt; SECTOR CATALOGUED • {total} STARS SYNCHRONIZED</text>
+
+<!-- Holographic Mission Result HUD -->
+<g class="hud-result" style="opacity:0;">
+  <rect width="{W}" height="{H}" fill="{DEEP}" opacity="0.88"/>
   <rect x="230" y="46" width="440" height="206" fill="{NAVY}"/>
   <rect x="232" y="48" width="436" height="202" fill="none" stroke="{BLUE}" stroke-width="4"/>
-  <rect x="238" y="54" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.35"/>
-</g>
-<text {A("fadeA")} x="450" y="86" text-anchor="middle" font-size="24" fill="{GOLD}" letter-spacing="6">EXPEDITION RESULT</text>
-<g {A("fadeB")}>
-  <text x="256" y="120" font-size="14" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
-  <text x="644" y="120" text-anchor="end" font-size="15" fill="#FFFFFF">{total}</text>
-</g>
-<g {A("fadeC")}>
-  <text x="256" y="146" font-size="14" fill="{SKY3}" letter-spacing="1">STAR NODES CHARTED</text>
-  <text x="644" y="146" text-anchor="end" font-size="15" fill="#FFFFFF">{nblocks}</text>
-</g>
-<g {A("fadeD")}>
-  <text x="256" y="172" font-size="14" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
-  <text x="644" y="172" text-anchor="end" font-size="15" fill="#FFFFFF">{best} DAYS</text>
-  <path d="M256 188H644" stroke="{BLUE}" stroke-width="3" stroke-dasharray="6 4"/>
-  <text x="256" y="219" font-size="16" fill="#FFFFFF" letter-spacing="3">SCORE</text>
-</g>
-{"".join(layers)}
-<g class="grade" style="opacity:0;animation:pop {T}s linear infinite">
-  <rect x="590" y="198" width="54" height="40" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
-  <text x="617" y="228" text-anchor="middle" font-size="30" fill="{gcol}">{grade}</text>
+  <rect x="238" y="54" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Corner Brackets -->
+  <path d="M232 60V48H244M656 48H668V60M232 238V250H244M656 250H668V238" stroke="{CYAN}" stroke-width="2" fill="none"/>
+
+  <text x="450" y="86" text-anchor="middle" font-size="22" fill="{GOLD}" letter-spacing="5">EXPEDITION REPORT</text>
+  
+  <text x="256" y="120" font-size="13" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
+  <text x="644" y="120" text-anchor="end" font-size="14" fill="#FFFFFF">{total} ★</text>
+  
+  <text x="256" y="146" font-size="13" fill="{SKY3}" letter-spacing="1">CHARTED STELLAR NODES</text>
+  <text x="644" y="146" text-anchor="end" font-size="14" fill="#FFFFFF">{nblocks}</text>
+  
+  <text x="256" y="172" font-size="13" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
+  <text x="644" y="172" text-anchor="end" font-size="14" fill="#FFFFFF">{best} DAYS</text>
+  
+  <path d="M256 188H644" stroke="{BLUE}" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="256" y="219" font-size="15" fill="#FFFFFF" letter-spacing="3">TOTAL STARS</text>
+
+  <!-- Roll-up score -->
+  {"".join(layers)}
+
+  <!-- Astronaut Rank Badge -->
+  <rect x="585" y="196" width="60" height="38" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
+  <text x="615" y="224" text-anchor="middle" font-size="26" fill="{gcol}">{grade}</text>
 </g>
 </svg>
 '''
