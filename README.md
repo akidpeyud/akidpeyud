@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=3D8BCB&center=true&vCenter=true&width=520&lines=Hi+%F0%9F%91%8B%2C+welcome+to+my+profile!;Web+Developer+in+the+making;Currently+learning+Laravel;Building+Simerah+Koja+%F0%9F%9A%80" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=14&pause=1200&color=3D8BCB&center=true&vCenter=true&width=640&height=40&lines=Hi+%F0%9F%91%8B%2C+welcome+to+my+profile!;Web+Developer+in+the+making;Currently+learning+Laravel;Building+Simerah+Koja+%F0%9F%9A%80" alt="Typing SVG" />
   </a>
 </p>
 
@@ -49,7 +49,7 @@
 <br/>
 
 <!-- ═══════════ STATS ═══════════ -->
-<h2 align="center">📊 GitHub Stats</h2>
+<h2 align="center">📊 Player Stats</h2>
 
 <p align="center">
   <img height="170" src="https://github-readme-stats.vercel.app/api?username=akidpeyud&show_icons=true&hide_border=false&border_radius=12&bg_color=1B365D&border_color=005A9C&title_color=FFFFFF&text_color=D6E8F5&icon_color=4DA3E0&ring_color=4DA3E0" alt="GitHub Stats" />
@@ -60,8 +60,10 @@
   <img src="https://streak-stats.demolab.com?user=akidpeyud&background=1B365D&border=005A9C&stroke=005A9C&ring=4DA3E0&fire=4DA3E0&currStreakNum=FFFFFF&sideNums=FFFFFF&currStreakLabel=D6E8F5&sideLabels=D6E8F5&dates=A9C9E4&border_radius=12" alt="GitHub Streak" />
 </p>
 
+<h2 align="center">🎮 Contribution Game</h2>
+
 <p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=akidpeyud&bg_color=1B365D&color=D6E8F5&line=4DA3E0&point=FFFFFF&area=true&area_color=005A9C&hide_border=true&radius=12" alt="Activity Graph" width="95%" />
+  <img src="https://raw.githubusercontent.com/akidpeyud/akidpeyud/output/github-snake.svg" alt="Snake eating my contributions" width="100%" />
 </p>
 
 <!-- ═══════════ FOOTER ═══════════ -->
