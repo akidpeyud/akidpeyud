@@ -2,9 +2,9 @@
 """
 Generator aset pixel-art untuk profil GitHub: Stellar Explorer (Penjelajah Bintang).
 Menghasilkan 3 file SVG di folder assets/:
-  - banner.svg        : Astronot melayang bebas (zero-G 2D gliding) & terminal identifikasi kosmik
+  - banner.svg        : Astronot melayang bebas di tengah kiri dekat bintang suar
   - stats.svg         : Logbook navigasi antariksa & telemetri sistem
-  - contrib-game.svg  : Astronot berjalan menuju rasi bintang nyata berdasarkan data kontribusi GitHub
+  - contrib-game.svg  : Astronot berjalan di bawah rasi bintang sambil menyenter ke atas ke arah bintang
 
 Hanya memakai pustaka standar Python.
 """
@@ -261,16 +261,16 @@ def clean_quest(name):
 
 # ───────────────────────── banner ─────────────────────────
 def make_banner(score, coins, quest):
-    W, H = 900, 260
+    W, H = 900, 240
 
     stars = []
     positions = [
-        (40, 56, 2), (90, 92, 2), (150, 52, 3), (210, 88, 2), (270, 60, 2),
+        (40, 56, 2), (90, 85, 2), (150, 52, 3), (210, 88, 2), (270, 60, 2),
         (330, 82, 1), (390, 55, 2), (450, 90, 3), (510, 58, 2), (570, 85, 1),
         (630, 52, 2), (690, 88, 3), (750, 62, 2), (810, 78, 1), (860, 55, 2),
-        (50, 180, 2), (100, 215, 3), (160, 190, 1), (220, 225, 2), (280, 195, 2),
-        (340, 230, 3), (400, 200, 1), (460, 220, 2), (520, 190, 3), (580, 230, 1),
-        (640, 200, 2), (700, 225, 3), (760, 195, 1), (820, 220, 2), (870, 190, 3),
+        (50, 175, 2), (100, 210, 3), (160, 185, 1), (220, 220, 2), (280, 190, 2),
+        (340, 225, 3), (400, 195, 1), (460, 215, 2), (520, 185, 3), (580, 225, 1),
+        (640, 195, 2), (700, 220, 3), (760, 190, 1), (820, 215, 2), (870, 185, 3),
     ]
     for i, (sx, sy, sz) in enumerate(positions):
         delay = (i * 0.24) % 2.6
@@ -293,12 +293,12 @@ def make_banner(score, coins, quest):
 </defs>
 <style>
   {FONT}
-  /* Animasi terbang 2D seimbang di tengah kanvas (tidak mepet atas) */
-  .spacewalk-2d {{
-    animation: flight_path_2d 7.5s ease-in-out infinite;
+  /* Animasi melayang di tengah kiri dekat bintang suar */
+  .spacewalk-float {{
+    animation: flight_relative 7s ease-in-out infinite;
   }}
   .thruster {{
-    animation: rcs_pulse 7.5s ease-in-out infinite;
+    animation: rcs_pulse 7s ease-in-out infinite;
   }}
   .beacon-star {{
     animation: pulse_star 2.8s ease-in-out infinite alternate;
@@ -311,11 +311,11 @@ def make_banner(score, coins, quest):
   }}
   .blink {{ animation: blink 1.1s steps(1) infinite; }}
 
-  @keyframes flight_path_2d {{
+  @keyframes flight_relative {{
     0%   {{ transform: translate(0px, 0px) rotate(0deg); }}
-    25%  {{ transform: translate(25px, -15px) rotate(-5deg); }}
-    50%  {{ transform: translate(42px, -4px) rotate(0deg); }}
-    75%  {{ transform: translate(22px, 12px) rotate(4deg); }}
+    25%  {{ transform: translate(18px, -10px) rotate(-4deg); }}
+    50%  {{ transform: translate(30px, -2px) rotate(0deg); }}
+    75%  {{ transform: translate(14px, 8px) rotate(3deg); }}
     100% {{ transform: translate(0px, 0px) rotate(0deg); }}
   }}
 
@@ -349,77 +349,79 @@ def make_banner(score, coins, quest):
 <!-- Deep Cosmos Background -->
 <rect width="{W}" height="{H}" fill="url(#cosmos_bg)"/>
 
-<!-- Outer Sci-Fi Frame dengan padding seimbang -->
+<!-- Outer Sci-Fi Frame -->
 <rect x="4" y="4" width="{W-8}" height="{H-8}" fill="none" stroke="{NAVY}" stroke-width="2"/>
 <rect x="8" y="8" width="{W-16}" height="{H-16}" fill="none" stroke="{BLUE}" stroke-width="1" opacity="0.45"/>
-<path d="M4 20V4H20M{W-20} 4H{W-4}V20M4 {H-20}V{H-4}H20M{W-20} {H-4}H{W-4}V{H-20}" stroke="{SKY3}" stroke-width="2" fill="none"/>
+<path d="M4 18V4H18M{W-18} 4H{W-4}V18M4 {H-18}V{H-4}H18M{W-18} {H-4}H{W-4}V{H-18}" stroke="{SKY3}" stroke-width="2" fill="none"/>
 
 <!-- Twinkling Background Stars -->
 {"".join(stars)}
 
 <!-- Shooting Star / Meteor -->
-<g class="meteor" transform="translate(850, 30)">
+<g class="meteor" transform="translate(850, 26)">
   <line x1="0" y1="0" x2="36" y2="-18" stroke="{GOLD_L}" stroke-width="2" opacity="0.85"/>
   <rect x="0" y="0" width="3" height="3" fill="#FFFFFF"/>
 </g>
 
 <!-- Distant Ringed Exoplanet -->
-<g opacity="0.8" transform="translate(760, 48)"><g>{PLANET_RINGED}</g></g>
+<g opacity="0.8" transform="translate(750, 42)"><g>{PLANET_RINGED}</g></g>
 
 <!-- Top Sci-Fi Navigation HUD Bar -->
-<rect x="12" y="14" width="{W-24}" height="32" fill="{DEEP}" opacity="0.9"/>
-<line x1="12" y1="46" x2="{W-12}" y2="46" stroke="{BLUE}" stroke-width="1"/>
-<text x="28" y="35" font-size="12" fill="{SKY3}" letter-spacing="2">[ PILOT // AKID ]</text>
-<text x="220" y="35" font-size="12" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {score:06d}</text>
-<text x="540" y="35" font-size="12" fill="{SKY3}" letter-spacing="2">SYSTEMS: x{coins:02d}</text>
-<text x="872" y="35" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
+<rect x="12" y="12" width="{W-24}" height="30" fill="{DEEP}" opacity="0.9"/>
+<line x1="12" y1="42" x2="{W-12}" y2="42" stroke="{BLUE}" stroke-width="1"/>
+<text x="26" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">[ PILOT // AKID ]</text>
+<text x="220" y="32" font-size="12" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {score:06d}</text>
+<text x="540" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">SYSTEMS: x{coins:02d}</text>
+<text x="872" y="32" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">MISSION: {esc(quest)}</text>
 
-<!-- Primary Pulsing Beacon Star ahead of Astronaut (Centered at y=138) -->
-<g transform="translate(245, 124)">
+<!-- Primary Pulsing Beacon Star (Tepat di tengah kiri pada y=125) -->
+<g transform="translate(240, 110)">
   <circle cx="15" cy="15" r="32" fill="url(#beacon_glow)"/>
   <g class="beacon-star" style="transform-origin: 15px 15px;">{STAR_LARGE}</g>
   <line x1="-50" y1="15" x2="0" y2="15" stroke="{CYAN}" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
 </g>
 
-<!-- Spacewalking Astronaut (Centered at y=120) -->
-<g class="spacewalk-2d" transform="translate(90, 120)">
-  <!-- Tether Cable connecting to starship -->
-  <path d="M-75 35 C -40 10, -15 50, 6 30" fill="none" stroke="{SKY1}" stroke-width="2" opacity="0.5"/>
-  <rect x="-80" y="33" width="6" height="6" fill="{BLUE}"/>
-  
-  <!-- RCS Jetpack Thruster Flame Puff -->
-  <g class="thruster" transform="translate(-10, 24)">
-    <polygon points="0,6 -8,3 -8,9" fill="{CYAN}"/>
-    <polygon points="0,6 -5,4 -5,8" fill="#FFFFFF"/>
+<!-- Astronot di TENGAN KIRI dekat bintang (y=110, bukan di atas) -->
+<g transform="translate(90, 110)">
+  <g class="spacewalk-float">
+    <!-- Tether Cable connecting to starship -->
+    <path d="M-65 35 C -35 15, -15 45, 6 30" fill="none" stroke="{SKY1}" stroke-width="2" opacity="0.5"/>
+    <rect x="-70" y="33" width="6" height="6" fill="{BLUE}"/>
+    
+    <!-- RCS Jetpack Thruster Flame Puff -->
+    <g class="thruster" transform="translate(-10, 24)">
+      <polygon points="0,6 -8,3 -8,9" fill="{CYAN}"/>
+      <polygon points="0,6 -5,4 -5,8" fill="#FFFFFF"/>
+    </g>
+    
+    <g>{HERO_FLY}</g>
+    
+    <!-- Scanner Cone Beam pointing directly to Beacon Star -->
+    <polygon points="66,36 145,20 145,52" fill="{CYAN}" opacity="0.14"/>
+    <line x1="66" y1="36" x2="145" y2="36" stroke="{CYAN}" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.75"/>
   </g>
-  
-  <g>{HERO_FLY}</g>
-  
-  <!-- Scanner Cone Beam pointing toward Beacon Star -->
-  <polygon points="66,36 145,20 145,52" fill="{CYAN}" opacity="0.14"/>
-  <line x1="66" y1="36" x2="145" y2="36" stroke="{CYAN}" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.75"/>
 </g>
 
-<!-- Right Side: Identification Terminal Card (Centered Vertically at y=62) -->
-<g transform="translate(420, 62)">
-  <rect width="455" height="175" fill="{DEEP}" opacity="0.9"/>
-  <rect x="2" y="2" width="451" height="171" fill="none" stroke="{NAVY}" stroke-width="2"/>
-  <rect x="6" y="6" width="443" height="163" fill="none" stroke="{BLUE}" stroke-width="1" opacity="0.5"/>
+<!-- Right Side: Identification Terminal Card (Tepat di tengah pada y=56) -->
+<g transform="translate(420, 56)">
+  <rect width="455" height="166" fill="{DEEP}" opacity="0.9"/>
+  <rect x="2" y="2" width="451" height="162" fill="none" stroke="{NAVY}" stroke-width="2"/>
+  <rect x="6" y="6" width="443" height="154" fill="none" stroke="{BLUE}" stroke-width="1" opacity="0.5"/>
   
   <rect x="14" y="14" width="220" height="18" fill="{NAVY}"/>
   <text x="20" y="27" font-size="10" fill="{CYAN}" letter-spacing="2">STELLAR CARTOGRAPHER // CLASS S</text>
 
-  <text x="16" y="68" font-size="30" fill="{DEEP}" letter-spacing="3">ANDIKA DWI PUTRA</text>
-  <text x="14" y="66" font-size="30" fill="#FFFFFF" letter-spacing="3">ANDIKA DWI PUTRA</text>
+  <text x="16" y="66" font-size="28" fill="{DEEP}" letter-spacing="3">ANDIKA DWI PUTRA</text>
+  <text x="14" y="64" font-size="28" fill="#FFFFFF" letter-spacing="3">ANDIKA DWI PUTRA</text>
 
-  <text x="14" y="96" font-size="12" fill="{SKY3}" letter-spacing="3">WEB DEVELOPER • CS STUDENT • STAR EXPLORER</text>
-  <line x1="14" y1="110" x2="440" y2="110" stroke="{BLUE}" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+  <text x="14" y="92" font-size="12" fill="{SKY3}" letter-spacing="3">WEB DEVELOPER • CS STUDENT • STAR EXPLORER</text>
+  <line x1="14" y1="104" x2="440" y2="104" stroke="{BLUE}" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
 
-  <text class="blink" x="14" y="136" font-size="12" fill="{GOLD}" letter-spacing="2">&gt; CHARTING THE DIGITAL UNIVERSE_</text>
+  <text class="blink" x="14" y="128" font-size="12" fill="{GOLD}" letter-spacing="2">&gt; CHARTING THE DIGITAL UNIVERSE_</text>
   
-  <text x="14" y="158" font-size="10" fill="{SKY1}" letter-spacing="1">SYS: ONLINE | RADAR: ACTIVE | PWR: 100%</text>
-  <rect x="370" y="150" width="70" height="8" fill="{NAVY}"/>
-  <rect x="372" y="152" width="60" height="4" fill="{SKY3}"/>
+  <text x="14" y="150" font-size="10" fill="{SKY1}" letter-spacing="1">SYS: ONLINE | RADAR: ACTIVE | PWR: 100%</text>
+  <rect x="370" y="142" width="70" height="8" fill="{NAVY}"/>
+  <rect x="372" y="144" width="60" height="4" fill="{SKY3}"/>
 </g>
 </svg>
 '''
@@ -491,37 +493,25 @@ def grade_for(total):
 def make_game(days, total, best):
     """
     Stellar Expedition:
-    Memetakan secara nyata 52 minggu kontribusi GitHub ke dalam koordinat rasi bintang.
-    Astronot melangkah di jembatan starlight menuju gugusan bintang yang aktif di sisi kanan.
+    - Bintang-bintang bersumber 100% dari data kontribusi nyata Anda (gugusan aktif di kanan).
+    - Bagian bulan & hari dihapus total agar tampilan minimalis, clean, dan lapang.
+    - Astronot berada DI BAWAH bintang-bintang dan MENYENTER KE ATAS ke arah rasi bintang.
     """
-    W, H = 900, 320
+    W, H = 900, 310
     T = 20  # Durasi siklus animasi dalam detik
     nblocks = sum(1 for d in days if d[3] > 0)
 
-    gx, gy = 115, 78
-    pitch_x, pitch_y = 14.0, 13.0
-    cols = max(d[2] for d in days) + 1
+    # Grid koordinat bintang (tanpa label bulan & hari, diletakkan bersih di atas)
+    gx, gy = 80, 68
+    pitch_x, pitch_y = 14.2, 14.0
 
-    # Identifikasi koordinat bulan-bulan dalam 52 minggu
-    month_names = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
-    month_labels = []
-    seen_months = set()
-    for d, r, c, l in sorted(days, key=lambda x: x[0]):
-        m_str = d[5:7]  # '01' to '12'
-        if m_str not in seen_months and r == 0:
-            seen_months.add(m_str)
-            m_idx = (int(m_str) + 1) % 12  # mapping ke nama bulan
-            name = month_names[m_idx]
-            month_labels.append(f'<text x="{gx + c * pitch_x:.1f}" y="65" font-size="10" fill="{SKY3}" letter-spacing="1">{name}</text>')
-
-    # Bangun bintang-bintang nyata berdasarkan tingkat kontribusi
+    # Bangun bintang nyata berdasarkan data kontribusi
     star_nodes = []
     active_points = []
     for d, r, c, lvl in days:
         sx = gx + c * pitch_x
         sy = gy + r * pitch_y
         if lvl == 0:
-            # Koordinat ruang hampa
             star_nodes.append(f'<rect x="{sx+4:.1f}" y="{sy+4:.1f}" width="3" height="3" fill="#14243B" rx="1"/>')
         elif lvl == 1:
             active_points.append((sx + 5, sy + 5, lvl))
@@ -561,12 +551,12 @@ def make_game(days, total, best):
                 f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{SKY3}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.5"/>'
             )
 
-    # Target walking astronaut adalah kolom aktif pertama (kolom ~38, x ≈ 640)
+    # Target walking: berhenti tepat di bawah gugusan bintang aktif di kanan
     target_walk_x = gx + 37 * pitch_x - 30
 
     css = [
-        # Astronot berjalan melangkah dari kiri ke arah gugusan bintang aktif
-        f"@keyframes astro_walk_forward {{"
+        # Astronot berjalan di bawah bintang dari x=50 ke x=target
+        f"@keyframes astro_walk_beneath {{"
         f"  0%   {{ transform: translateX(50px); }}"
         f"  38%  {{ transform: translateX({target_walk_x:.0f}px); }}"
         f"  65%  {{ transform: translateX({target_walk_x:.0f}px); }}"
@@ -574,14 +564,15 @@ def make_game(days, total, best):
         f"  100% {{ transform: translateX(50px); }}"
         f"}}",
         "@keyframes step_cycle { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }",
-        "@keyframes scanner_flare {"
-        "  0%, 36% { opacity: 0; transform: scaleX(0.2); }"
-        "  40%, 63% { opacity: 0.95; transform: scaleX(1); }"
-        "  67%, 100% { opacity: 0; transform: scaleX(0.2); }"
+        # Senter / scanner menyorot ke atas ke arah bintang
+        "@keyframes flashlight_beam {"
+        "  0%, 36% { opacity: 0; transform: scale(0.3); }"
+        "  40%, 63% { opacity: 0.95; transform: scale(1); }"
+        "  67%, 100% { opacity: 0; transform: scale(0.3); }"
         "}",
         "@keyframes star_glow {"
         "  0%, 100% { opacity: 0.8; }"
-        "  50% { opacity: 1; filter: drop-shadow(0 0 3px #FFD166); }"
+        "  50% { opacity: 1; filter: drop-shadow(0 0 4px #FFD166); }"
         "}",
         f"@keyframes hud_report {{"
         f"  0%, 42% {{ opacity: 0; transform: translateY(12px); }}"
@@ -614,23 +605,24 @@ def make_game(days, total, best):
     grade = grade_for(total)
     gcol = {"S": GOLD, "A": SKY3, "B": SKY2, "C": SKY1, "D": PALE}[grade]
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Celestial Cartography: Astronaut walking towards discovered stars">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" shape-rendering="crispEdges" role="img" aria-label="Celestial Cartography: Astronaut exploring discovered stars">
 <defs>
   <linearGradient id="game_cosmos" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%" stop-color="{DEEP}"/>
     <stop offset="55%" stop-color="{NAVY}"/>
     <stop offset="100%" stop-color="{DEEP}"/>
   </linearGradient>
-  <linearGradient id="beam_glow" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="{CYAN}" stop-opacity="0.9"/>
-    <stop offset="70%" stop-color="{SKY2}" stop-opacity="0.4"/>
+  <!-- Sinar senter kosmik menyorot ke atas ke arah bintang -->
+  <linearGradient id="flashlight_glow" x1="0" y1="1" x2="0.6" y2="0">
+    <stop offset="0%" stop-color="{CYAN}" stop-opacity="0.95"/>
+    <stop offset="60%" stop-color="{SKY2}" stop-opacity="0.45"/>
     <stop offset="100%" stop-color="{GOLD}" stop-opacity="0"/>
   </linearGradient>
 </defs>
 <style>
   {FONT}
   .walker-group {{
-    animation: astro_walk_forward {T}s ease-in-out infinite;
+    animation: astro_walk_beneath {T}s ease-in-out infinite;
   }}
   .step-a {{
     animation: step_cycle 0.4s steps(1) infinite;
@@ -638,9 +630,9 @@ def make_game(days, total, best):
   .step-b {{
     animation: step_cycle 0.4s steps(1) infinite reverse;
   }}
-  .scan-flare {{
-    animation: scanner_flare {T}s ease-in-out infinite;
-    transform-origin: 0% 50%;
+  .flashlight-beam {{
+    animation: flashlight_beam {T}s ease-in-out infinite;
+    transform-origin: 0% 100%;
   }}
   .star-cluster {{
     animation: star_glow 2.5s ease-in-out infinite alternate;
@@ -657,86 +649,80 @@ def make_game(days, total, best):
 <!-- Outer Technical Frame -->
 <rect x="4" y="4" width="{W-8}" height="{H-8}" fill="none" stroke="{NAVY}" stroke-width="2"/>
 <rect x="8" y="8" width="{W-16}" height="{H-16}" fill="none" stroke="{BLUE}" stroke-width="1" opacity="0.45"/>
-<path d="M4 20V4H20M{W-20} 4H{W-4}V20M4 {H-20}V{H-4}H20M{W-20} {H-4}H{W-4}V{H-20}" stroke="{SKY3}" stroke-width="2" fill="none"/>
+<path d="M4 18V4H18M{W-18} 4H{W-4}V18M4 {H-18}V{H-4}H18M{W-18} {H-4}H{W-4}V{H-18}" stroke="{SKY3}" stroke-width="2" fill="none"/>
 
-<!-- Top Expedition HUD Bar (Padding seimbang di y=14) -->
-<rect x="12" y="14" width="{W-24}" height="32" fill="{DEEP}" opacity="0.92"/>
-<line x1="12" y1="46" x2="{W-12}" y2="46" stroke="{BLUE}" stroke-width="1"/>
-<text x="28" y="35" font-size="12" fill="{SKY3}" letter-spacing="2">[ STELLAR EXPEDITION // STARWAY ]</text>
-<text x="872" y="35" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {total} | NODES: {nblocks}</text>
-
-<!-- Month Labels across the 52 Weeks -->
-{"".join(month_labels)}
-
-<!-- Weekday Indicator Labels -->
-<text x="82" y="{gy + 1 * pitch_y + 8}" font-size="9" fill="{SKY1}">Mon</text>
-<text x="82" y="{gy + 3 * pitch_y + 8}" font-size="9" fill="{SKY1}">Wed</text>
-<text x="82" y="{gy + 5 * pitch_y + 8}" font-size="9" fill="{SKY1}">Fri</text>
+<!-- Top Expedition HUD Bar -->
+<rect x="12" y="12" width="{W-24}" height="30" fill="{DEEP}" opacity="0.92"/>
+<line x1="12" y1="42" x2="{W-12}" y2="42" stroke="{BLUE}" stroke-width="1"/>
+<text x="26" y="32" font-size="12" fill="{SKY3}" letter-spacing="2">[ STELLAR EXPEDITION // STARWAY ]</text>
+<text x="872" y="32" text-anchor="end" font-size="12" fill="{GOLD}" letter-spacing="2">★ STARS DISCOVERED: {total} | NODES: {nblocks}</text>
 
 <!-- Constellation Links connecting Active Discovered Stars -->
 {"".join(constellation_lines)}
 
-<!-- The Discovered Stars Matrix (Kesesuaian 100% dengan Data Kontribusi Nyata) -->
+<!-- The Discovered Stars Matrix (Bersih tanpa teks bulan & hari) -->
 <g class="star-cluster">{"".join(star_nodes)}</g>
 
-<!-- Luminous Celestial Pathway / Starlight Bridge (y=205) -->
-<rect x="30" y="205" width="840" height="4" fill="{BLUE}"/>
-<rect x="30" y="205" width="840" height="1" fill="{SKY3}"/>
+<!-- Luminous Celestial Pathway / Starlight Bridge (y=226) -->
+<rect x="30" y="226" width="840" height="4" fill="{BLUE}"/>
+<rect x="30" y="226" width="840" height="1" fill="{SKY3}"/>
 <!-- Pathway tick marks -->
-<path d="M50 209V213M120 209V213M190 209V213M260 209V213M330 209V213M400 209V213M470 209V213M540 209V213M610 209V213M680 209V213M750 209V213M820 209V213" stroke="{NAVY}" stroke-width="2"/>
-<rect x="30" y="209" width="840" height="10" fill="{DEEP}" opacity="0.6"/>
+<path d="M50 230V234M120 230V234M190 230V234M260 230V234M330 230V234M400 230V234M470 230V234M540 230V234M610 230V234M680 230V234M750 230V234M820 230V234" stroke="{NAVY}" stroke-width="2"/>
+<rect x="30" y="230" width="840" height="10" fill="{DEEP}" opacity="0.6"/>
 
-<!-- Astronaut Walking Towards the Discovered Star Cluster (Feet at y=205) -->
-<g class="walker-group" transform="translate(0, 157)">
-  <!-- Navigation Tether -->
-  <path d="M-40 25 C -20 15, -10 30, 4 20" fill="none" stroke="{SKY1}" stroke-width="1.5" opacity="0.5"/>
-  <rect x="-44" y="23" width="5" height="5" fill="{BLUE}"/>
+<!-- Astronot DI BAWAH bintang-bintang (y=178) menyenter ke atas ke arah bintang -->
+<g transform="translate(0, 178)">
+  <g class="walker-group">
+    <!-- Navigation Tether -->
+    <path d="M-35 25 C -15 15, -5 30, 4 20" fill="none" stroke="{SKY1}" stroke-width="1.5" opacity="0.5"/>
+    <rect x="-38" y="23" width="5" height="5" fill="{BLUE}"/>
 
-  <!-- Animated Walking Legs -->
-  <g class="step-a">{HERO_WALK_A}</g>
-  <g class="step-b">{HERO_WALK_B}</g>
+    <!-- Animated Walking Legs -->
+    <g class="step-a">{HERO_WALK_A}</g>
+    <g class="step-b">{HERO_WALK_B}</g>
 
-  <!-- Scanner Starlight Discovery Projection -->
-  <g class="scan-flare" transform="translate(48, 24)">
-    <polygon points="0,0 320,-85 320,60" fill="url(#beam_glow)"/>
-    <line x1="0" y1="0" x2="320" y2="-15" stroke="{WHITE}" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <!-- Senter Kosmik menyorot KE ATAS ke arah gugusan bintang -->
+    <g class="flashlight-beam" transform="translate(46, 18)">
+      <polygon points="0,0 280,-125 280,10" fill="url(#flashlight_glow)"/>
+      <line x1="0" y1="0" x2="280" y2="-65" stroke="{WHITE}" stroke-width="1.5" stroke-dasharray="3 3"/>
+    </g>
   </g>
 </g>
 
 <!-- Dynamic Status Telemetry (Bottom) -->
-<rect x="12" y="{H-34}" width="{W-24}" height="24" fill="{DEEP}" opacity="0.92"/>
-<line x1="12" y1="{H-34}" x2="{W-12}" y2="{H-34}" stroke="{NAVY}" stroke-width="1"/>
-<text style="opacity:0;animation:phase1 {T}s linear infinite" x="28" y="{H-18}" font-size="11" fill="{GOLD}" letter-spacing="2">&gt; PILOT WALKING TOWARDS UNCHARTED SPACE (NOV - JUL)...</text>
-<text style="opacity:0;animation:phase2 {T}s linear infinite" x="28" y="{H-18}" font-size="11" fill="{CYAN}" letter-spacing="2">&gt; STELLAR CONSTELLATION LOCATED (AUG - OCT)! SCANNING STARS...</text>
-<text style="opacity:0;animation:phase3 {T}s linear infinite" x="28" y="{H-18}" font-size="11" fill="{SKY3}" letter-spacing="2">&gt; {total} STARS SYNCHRONIZED ACROSS 50 CONSTELLATION NODES ★</text>
+<rect x="12" y="{H-32}" width="{W-24}" height="22" fill="{DEEP}" opacity="0.92"/>
+<line x1="12" y1="{H-32}" x2="{W-12}" y2="{H-32}" stroke="{NAVY}" stroke-width="1"/>
+<text style="opacity:0;animation:phase1 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{GOLD}" letter-spacing="2">&gt; PILOT WALKING TOWARDS UNCHARTED SPACE...</text>
+<text style="opacity:0;animation:phase2 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{CYAN}" letter-spacing="2">&gt; FLASHLIGHT BEAM ILLUMINATING DISCOVERED CONSTELLATION...</text>
+<text style="opacity:0;animation:phase3 {T}s linear infinite" x="26" y="{H-17}" font-size="11" fill="{SKY3}" letter-spacing="2">&gt; {total} STARS SYNCHRONIZED ACROSS {nblocks} CONSTELLATION NODES ★</text>
 
 <!-- Holographic Mission Result HUD Panel -->
 <g class="hud-panel" style="opacity:0;">
   <rect width="{W}" height="{H}" fill="{DEEP}" opacity="0.88"/>
-  <rect x="230" y="55" width="440" height="206" fill="{NAVY}"/>
-  <rect x="232" y="57" width="436" height="202" fill="none" stroke="{BLUE}" stroke-width="3"/>
-  <rect x="238" y="63" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.4"/>
+  <rect x="230" y="50" width="440" height="206" fill="{NAVY}"/>
+  <rect x="232" y="52" width="436" height="202" fill="none" stroke="{BLUE}" stroke-width="3"/>
+  <rect x="238" y="58" width="424" height="190" fill="none" stroke="{SKY3}" stroke-width="1" opacity="0.4"/>
   
-  <path d="M232 67V57H242M658 57H668V67M232 249V259H242M658 259H668V249" stroke="{CYAN}" stroke-width="2" fill="none"/>
+  <path d="M232 62V52H242M658 52H668V62M232 244V254H242M658 254H668V244" stroke="{CYAN}" stroke-width="2" fill="none"/>
 
-  <text x="450" y="95" text-anchor="middle" font-size="22" fill="{GOLD}" letter-spacing="5">EXPEDITION REPORT</text>
+  <text x="450" y="90" text-anchor="middle" font-size="22" fill="{GOLD}" letter-spacing="5">EXPEDITION REPORT</text>
   
-  <text x="256" y="129" font-size="13" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
-  <text x="644" y="129" text-anchor="end" font-size="14" fill="#FFFFFF">{total} ★</text>
+  <text x="256" y="124" font-size="13" fill="{SKY3}" letter-spacing="1">STARS DISCOVERED</text>
+  <text x="644" y="124" text-anchor="end" font-size="14" fill="#FFFFFF">{total} ★</text>
   
-  <text x="256" y="155" font-size="13" fill="{SKY3}" letter-spacing="1">ACTIVE STELLAR NODES</text>
-  <text x="644" y="155" text-anchor="end" font-size="14" fill="#FFFFFF">{nblocks} DAYS</text>
+  <text x="256" y="150" font-size="13" fill="{SKY3}" letter-spacing="1">ACTIVE STELLAR NODES</text>
+  <text x="644" y="150" text-anchor="end" font-size="14" fill="#FFFFFF">{nblocks} DAYS</text>
   
-  <text x="256" y="181" font-size="13" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
-  <text x="644" y="181" text-anchor="end" font-size="14" fill="#FFFFFF">{best} DAYS</text>
+  <text x="256" y="176" font-size="13" fill="{SKY3}" letter-spacing="1">LONGEST EXPEDITION</text>
+  <text x="644" y="176" text-anchor="end" font-size="14" fill="#FFFFFF">{best} DAYS</text>
   
-  <path d="M256 197H644" stroke="{BLUE}" stroke-width="2" stroke-dasharray="6 4"/>
-  <text x="256" y="228" font-size="15" fill="#FFFFFF" letter-spacing="3">TOTAL STARS</text>
+  <path d="M256 192H644" stroke="{BLUE}" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="256" y="223" font-size="15" fill="#FFFFFF" letter-spacing="3">TOTAL STARS</text>
 
   {"".join(layers)}
 
-  <rect x="585" y="205" width="60" height="38" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
-  <text x="615" y="233" text-anchor="middle" font-size="26" fill="{gcol}">{grade}</text>
+  <rect x="585" y="200" width="60" height="38" fill="{DEEP}" stroke="{gcol}" stroke-width="3"/>
+  <text x="615" y="228" text-anchor="middle" font-size="26" fill="{gcol}">{grade}</text>
 </g>
 </svg>
 '''
