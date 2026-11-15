@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=13&pause=1200&color=3D8BCB&center=true&vCenter=true&width=750&height=45&lines=Incoming+Transmission...+Greetings+Explorer%21+%F0%9F%93%A1;Stellar+Explorer+%26+Full-Stack+Astronaut+%F0%9F%A7%91%E2%80%8D%F0%9F%9A%80;Crafting+Systems%3A+Laravel%2C+PHP%2C+JavaScript+%E2%9A%A1;Active+Quests%3A+Simerah+Koja+%F0%9F%9A%80;Navigating+the+Infinite+Digital+Cosmos+%E2%9C%A8" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=13&pause=1200&color=3D8BCB&center=true&vCenter=true&width=750&height=45&lines=Incoming+Transmission...+Greetings+Explorer%21+%F0%9F%93%A1;Stellar+Explorer+%26+Full-Stack+Astronaut+%F0%9F%A7%91%E2%80%8D%F0%9F%9A%80;Crafting+Systems%3A+Laravel%2C+PHP%2C+JavaScript+%E2%9A%A1;Active+Quests%3A+Si-Merah-Koja+%F0%9F%9A%80;Navigating+the+Infinite+Digital+Cosmos+%E2%9C%A8" alt="Typing SVG" />
   </a>
 </p>
 
@@ -32,7 +32,7 @@
 
 | | |
 |:---|:---|
-| 🔭 **Current Mission** | Simerah Koja |
+| 🔭 **Current Mission** | Si-Merah-Koja |
 | 🌱 **Learning Orbit** | Laravel &amp; Modern Web Architecture |
 | 💼 **LinkedIn** | [Andika Dwi Putra](https://www.linkedin.com/in/andika-dwi-putra-79a502154/) |
 | 📡 **Comms / Email** | dwiputdika@gmail.com |
